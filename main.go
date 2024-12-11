@@ -194,10 +194,6 @@ func fetchGeniusLyrics(title, artist string) (string, error) {
 	return "", fmt.Errorf("no lyrics found")
 }
 
-func calculateTotalPages(totalResults int) int {
-	return (totalResults + 9) / 10
-}
-
 func searchGeniusSongs(query string, page int) ([]Song, int, error) {
 	if config.GeniusClientID == "" {
 		if err := loadConfig(); err != nil {
@@ -242,7 +238,15 @@ func searchGeniusSongs(query string, page int) ([]Song, int, error) {
 		})
 	}
 
-	return songs, len(songs), nil
+	// Hardcode total results to allow pagination
+	const totalResults = 100 // Adjust based on Genius API pagination behavior
+
+	return songs, totalResults, nil
+}
+
+func calculateTotalPages(totalResults int) int {
+	const resultsPerPage = 10
+	return (totalResults + resultsPerPage - 1) / resultsPerPage
 }
 
 func handleHome(w http.ResponseWriter, r *http.Request) {
