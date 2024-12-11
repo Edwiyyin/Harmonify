@@ -45,6 +45,7 @@ type Config struct {
 	GeniusClientID     string `json:"genius_client_id"`
 	GeniusClientSecret string `json:"genius_client_secret"`
 	GeniusAccessToken  string `json:"genius_access_token"`
+	YoutubeAPIKey      string `json:"youtube_api_key"`
 }
 
 var (
@@ -193,40 +194,6 @@ func fetchGeniusLyrics(title, artist string) (string, error) {
 	return "", fmt.Errorf("no lyrics found")
 }
 
-func searchSongURL(title, artist string) (string, error) {
-	encodedTitle := url.QueryEscape(title)
-	encodedArtist := url.QueryEscape(artist)
-	query := fmt.Sprintf("%s %s", encodedTitle, encodedArtist)
-
-	apiURL := fmt.Sprintf("https://api.genius.com/search?q=%s", query)
-
-	req, err := http.NewRequest("GET", apiURL, nil)
-	if err != nil {
-		return "", err
-	}
-
-	req.Header.Add("Authorization", "Bearer "+config.GeniusAccessToken)
-	req.Header.Add("Accept", "application/json")
-
-	client := &http.Client{Timeout: 10 * time.Second}
-	resp, err := client.Do(req)
-	if err != nil {
-		return "", err
-	}
-	defer resp.Body.Close()
-
-	var geniusResp GeniusResponse
-	if err := json.NewDecoder(resp.Body).Decode(&geniusResp); err != nil {
-		return "", err
-	}
-
-	if len(geniusResp.Response.Hits) > 0 {
-		return geniusResp.Response.Hits[0].Result.URL, nil
-	}
-
-	return "", fmt.Errorf("no song URL found")
-}
-
 func calculateTotalPages(totalResults int) int {
 	return (totalResults + 9) / 10
 }
@@ -326,14 +293,51 @@ func handleSearch(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func searchYoutubeMusicURL(title, artist string) (string, error) {
+	// Construct search query
+	query := fmt.Sprintf("%s %s official audio", title, artist)
+	encodedQuery := url.QueryEscape(query)
+
+	// YouTube Music search URL (Note: This is a simulated approach)
+	apiURL := fmt.Sprintf("https://www.googleapis.com/youtube/v3/search?part=snippet&q=%s&type=video&key=%s", 
+		encodedQuery, 
+		config.YoutubeAPIKey)
+
+	resp, err := http.Get(apiURL)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	var youtubeResp struct {
+		Items []struct {
+			ID struct {
+				VideoID string `json:"videoId"`
+			} `json:"id"`
+		} `json:"items"`
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&youtubeResp); err != nil {
+		return "", err
+	}
+
+	if len(youtubeResp.Items) > 0 {
+		return fmt.Sprintf("https://www.youtube.com/embed/%s?autoplay=1", 
+			youtubeResp.Items[0].ID.VideoID), nil
+	}
+
+	return "", fmt.Errorf("no music video found")
+}
+
 func handleLyrics(w http.ResponseWriter, r *http.Request) {
 	songID := r.URL.Query().Get("id")
 	songTitle := r.URL.Query().Get("title")
 	artist := r.URL.Query().Get("artist")
 	
-	_, err := searchSongURL(songTitle, artist)
+	musicURL, err := searchYoutubeMusicURL(songTitle, artist)
 	if err != nil {
-		log.Printf("Error fetching song URL: %v", err)
+		log.Printf("Music URL error: %v", err)
+		musicURL = "" // Fallback to empty
 	}
 
 	lyrics, err := fetchLyrics(songTitle, artist)
@@ -343,15 +347,17 @@ func handleLyrics(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := struct {
-		Title   string
-		Artist  string
-		Lyrics  string
-		ID      string
+		Title    string
+		Artist   string
+		Lyrics   string
+		ID       string
+		MusicURL string
 	}{
-		Title:  songTitle,
-		Artist: artist,
-		Lyrics: lyrics,
-		ID:     songID,
+		Title:    songTitle,
+		Artist:   artist,
+		Lyrics:   lyrics,
+		ID:       songID,
+		MusicURL: musicURL,
 	}
 
 	if err := lyricsTemplate.Execute(w, data); err != nil {
@@ -367,15 +373,31 @@ func handleAddFavorite(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Check for existing favorites with case-insensitive comparison
 	for _, existingSong := range favorites {
-		if existingSong.ID == song.ID {
-			json.NewEncoder(w).Encode(map[string]bool{"success": false})
+		if strings.EqualFold(existingSong.ID, song.ID) {
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"success": false,
+				"message": "Song already in favorites",
+			})
 			return
 		}
 	}
 
+	// Add to favorites
 	favorites = append(favorites, song)
-	json.NewEncoder(w).Encode(map[string]bool{"success": true})
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"success": true,
+		"message": "Song added to favorites",
+	})
+}
+
+// Add a handler to get favorites (for potential future use)
+func handleGetFavorites(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(favorites)
 }
 
 func handleRemoveFavorite(w http.ResponseWriter, r *http.Request) {
@@ -437,6 +459,7 @@ func main() {
 	http.HandleFunc("/favorites", handleFavorites)
 	http.HandleFunc("/add-favorite", handleAddFavorite)
 	http.HandleFunc("/remove-favorite", handleRemoveFavorite)
+	http.HandleFunc("/get-favorites", handleGetFavorites)
 
 	server := &http.Server{
 		Addr:         ":8080",
