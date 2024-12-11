@@ -85,7 +85,6 @@
         const title = document.getElementById('title').textContent.trim();
         const artist = document.getElementById('artist').textContent.trim();
 
-        // Add to Favorites
         favoriteButton.addEventListener('click', async (e) => {
             e.preventDefault();
             const songId = new URLSearchParams(window.location.search).get('id');
@@ -111,7 +110,6 @@
             }
         });
 
-        // YouTube Video Search
         async function searchYouTubeMusic() {
             try {
                 const response = await fetch(`/search-youtube?title=${encodeURIComponent(title)}&artist=${encodeURIComponent(artist)}`);

@@ -55,6 +55,10 @@
             border-radius: 5px;
             text-align: center;
         }
+        .btn-back{
+            background-color: #6b7280;
+            color: white;
+        }
         .btn-lyrics {
             background-color: #2563eb;
             color: white;
@@ -78,7 +82,7 @@
 <body>
     <div class="container">
         <h1 id="search-results-for-{{.Query}}" class="page-title">Search Results for "{{.Query}}"</h1>
-
+        <a href="/" class="btn btn-back">Go Home</a>
         <div class="results-grid">
             {{range .Songs}}
             <div class="song-card" data-song-id="{{.ID}}">
