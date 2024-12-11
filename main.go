@@ -72,11 +72,9 @@ func loadConfig() error {
 }
 
 func fetchLyrics(title, artist string) (string, error) {
-	// Normalize input by trimming and converting to lowercase
 	title = strings.TrimSpace(strings.ToLower(title))
 	artist = strings.TrimSpace(strings.ToLower(artist))
 
-	// List of APIs to try
 	apis := []func(string, string) (string, error){
 		fetchLyricsOvh,
 		fetchGeniusLyrics,
