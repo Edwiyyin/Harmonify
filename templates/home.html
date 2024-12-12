@@ -73,7 +73,11 @@
     </style>
 </head>
 <body>
+
     <div class="container">
+        <div class ="image">
+            <img src="1.png" alt="music icon" width="360px" height="200px">
+        </div>
         <h1 id="lyrics-finder" class="page-title">Harmonify</h1>
 
         <p>Find lyrics to your favorite songs instantly! Simply enter a song title, artist name, or both.</p>
@@ -105,7 +109,6 @@
                     const response = await fetch(`/search-suggestions?q=${encodeURIComponent(query)}`);
                     const suggestions = await response.json();
                     
-                    // Create or update suggestion dropdown
                     let suggestionDropdown = document.getElementById('search-suggestions');
                     if (!suggestionDropdown) {
                         suggestionDropdown = document.createElement('div');

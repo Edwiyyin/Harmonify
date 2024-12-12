@@ -111,7 +111,6 @@
                     if (result.success) {
                         songCard.remove();
                         
-                        // Check if no favorites remain
                         const remainingFavorites = document.querySelectorAll('.song-card');
                         if (remainingFavorites.length === 0) {
                             const grid = document.querySelector('.favorites-grid');
