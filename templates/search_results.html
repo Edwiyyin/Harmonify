@@ -8,7 +8,6 @@
 <body>
     <div class="container">
         <h1 id="search-results-for-{{.Query}}" class="page-title">Search Results for "{{.Query}}"</h1>
-        <a href="/" class="btn btn-back">Go Home</a>
         <div class="results-grid">
             {{range .Songs}}
             <div class="song-card" data-song-id="{{.ID}}">
@@ -37,11 +36,12 @@
             {{if gt .CurrentPage 1}}
                 <a href="/search?query={{.Query}}&page={{minus .CurrentPage}}" class="btn btn-pagination">Previous</a>
             {{end}}
+              <a href="/" class="btn btn-back">Go Home</a>
             {{if lt .CurrentPage .TotalPages}}
                 <a href="/search?query={{.Query}}&page={{plus .CurrentPage}}" class="btn btn-pagination">Next</a>
             {{end}}
         </div>
-
+        
         <div class="page-info">
             Page {{.CurrentPage}} of {{.TotalPages}} (Total Results: {{.TotalResults}})
         </div>
