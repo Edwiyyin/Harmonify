@@ -50,10 +50,6 @@
             background-color: #2563eb;
             color: white;
         }
-        .btn-listen {
-            background-color: #10b981;
-            color: white;
-        }
         .remove-btn {
             background-color: #ef4444;
             color: white;
@@ -76,8 +72,7 @@
                 <p>{{.Artist}}</p>
 
                 <div class="song-actions">
-                    <a href="/lyrics?id={{.ID}}&title={{.Title}}&artist={{.Artist}}" class="btn btn-primary">View Lyrics</a>
-                    <a href="/lyrics?id={{.ID}}&title={{.Title}}&artist={{.Artist}}" class="btn btn-listen">Listen 🎵</a>
+                    <a href="/lyrics?id={{.ID}}&title={{urlencodeTitle .Title}}&artist={{urlencodeTitle .Artist}}" class="btn btn-primary">View Lyrics</a>
                     <span class="remove-favorite">✖</span>
                 </div>
             </div>

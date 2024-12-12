@@ -1,15 +1,14 @@
 package main
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"html"
-	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
 	"os"
-	"regexp"
 	"strconv"
 	"strings"
 	"text/template"
@@ -46,6 +45,22 @@ type Config struct {
 	GeniusClientSecret string `json:"genius_client_secret"`
 	GeniusAccessToken  string `json:"genius_access_token"`
 	YoutubeAPIKey      string `json:"youtube_api_key"`
+	SpotifyClientID    string `json:"spotify_client_id"`
+	SpotifyClientSecret string `json:"spotify_client_secret"`
+}
+
+type SpotifyTokenResponse struct {
+	AccessToken string `json:"access_token"`
+	TokenType   string `json:"token_type"`
+	ExpiresIn   int    `json:"expires_in"`
+}
+
+type SpotifyTrackResponse struct {
+	Tracks struct {
+		Items []struct {
+			PreviewURL string `json:"preview_url"`
+		} `json:"items"`
+	} `json:"tracks"`
 }
 
 var (
@@ -55,6 +70,8 @@ var (
 	favoritesTemplate   *template.Template
 	favorites           []Song
 	config              Config
+	spotifyAccessToken string
+	spotifyTokenExpiry time.Time
 )
 
 func loadConfig() error {
@@ -72,23 +89,84 @@ func loadConfig() error {
 	return nil
 }
 
-func fetchLyrics(title, artist string) (string, error) {
-	title = strings.TrimSpace(strings.ToLower(title))
-	artist = strings.TrimSpace(strings.ToLower(artist))
-
-	apis := []func(string, string) (string, error){
-		fetchLyricsOvh,
-		fetchGeniusLyrics,
+func getSpotifyAccessToken() (string, error) {
+	if spotifyAccessToken != "" && time.Now().Before(spotifyTokenExpiry) {
+		return spotifyAccessToken, nil
 	}
 
-	for _, apiFunc := range apis {
-		lyrics, err := apiFunc(title, artist)
-		if err == nil && lyrics != "" {
-			return lyrics, nil
-		}
+	clientID := config.SpotifyClientID
+	clientSecret := config.SpotifyClientSecret
+
+	data := url.Values{}
+	data.Set("grant_type", "client_credentials")
+
+	req, err := http.NewRequest("POST", "https://accounts.spotify.com/api/token", strings.NewReader(data.Encode()))
+	if err != nil {
+		return "", err
 	}
 
-	return "Lyrics not found", nil
+	req.Header.Add("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte(clientID+":"+clientSecret)))
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	var tokenResp SpotifyTokenResponse
+	if err := json.NewDecoder(resp.Body).Decode(&tokenResp); err != nil {
+		return "", err
+	}
+
+	spotifyAccessToken = tokenResp.AccessToken
+	spotifyTokenExpiry = time.Now().Add(time.Duration(tokenResp.ExpiresIn) * time.Second)
+
+	return spotifyAccessToken, nil
+}
+
+func searchSpotifyMusicSource(title, artist string) (string, error) {
+    accessToken, err := getSpotifyAccessToken()
+    if err != nil {
+        return "", fmt.Errorf("spotify token error: %v", err)
+    }
+
+    query := fmt.Sprintf("%s %s", title, artist)
+    encodedQuery := url.QueryEscape(query)
+
+    req, err := http.NewRequest("GET", 
+        fmt.Sprintf("https://api.spotify.com/v1/search?q=%s&type=track&limit=1", encodedQuery), 
+        nil)
+    if err != nil {
+        return "", err
+    }
+
+    req.Header.Add("Authorization", "Bearer "+accessToken)
+    req.Header.Add("Content-Type", "application/json")
+
+    client := &http.Client{Timeout: 10 * time.Second}
+    resp, err := client.Do(req)
+    if err != nil {
+        return "", err
+    }
+    defer resp.Body.Close()
+
+    // Log the response status and body for debugging
+    bodyBytes, _ := ioutil.ReadAll(resp.Body)
+    log.Printf("Spotify Response Status: %s", resp.Status)
+    log.Printf("Spotify Response Body: %s", string(bodyBytes))
+
+    var trackResp SpotifyTrackResponse
+    if err := json.Unmarshal(bodyBytes, &trackResp); err != nil {
+        return "", fmt.Errorf("JSON parsing error: %v", err)
+    }
+
+    if len(trackResp.Tracks.Items) > 0 && trackResp.Tracks.Items[0].PreviewURL != "" {
+        return trackResp.Tracks.Items[0].PreviewURL, nil
+    }
+
+    return "", fmt.Errorf("no preview URL found for %s by %s", title, artist)
 }
 
 func fetchLyricsOvh(title, artist string) (string, error) {
@@ -125,73 +203,6 @@ func fetchLyricsOvh(title, artist string) (string, error) {
 	}
 
 	return lyrics, nil
-}
-
-func fetchGeniusLyrics(title, artist string) (string, error) {
-	apiURL := fmt.Sprintf("https://api.genius.com/search?q=%s%%20%s", 
-		url.QueryEscape(title), 
-		url.QueryEscape(artist))
-
-	req, err := http.NewRequest("GET", apiURL, nil)
-	if err != nil {
-		return "", err
-	}
-
-	req.Header.Add("Authorization", "Bearer "+config.GeniusAccessToken)
-	req.Header.Add("Accept", "application/json")
-
-	client := &http.Client{Timeout: 10 * time.Second}
-	resp, err := client.Do(req)
-	if err != nil {
-		return "", err
-	}
-	defer resp.Body.Close()
-
-	var geniusResp struct {
-		Response struct {
-			Hits []struct {
-				Result struct {
-					URL string `json:"url"`
-				} `json:"result"`
-			} `json:"hits"`
-		} `json:"response"`
-	}
-
-	if err := json.NewDecoder(resp.Body).Decode(&geniusResp); err != nil {
-		return "", err
-	}
-
-	if len(geniusResp.Response.Hits) == 0 {
-		return "", fmt.Errorf("no song found")
-	}
-
-	songURL := geniusResp.Response.Hits[0].Result.URL
-	
-	scrapeResp, err := http.Get(songURL)
-	if err != nil {
-		return "", err
-	}
-	defer scrapeResp.Body.Close()
-
-	body, err := io.ReadAll(scrapeResp.Body)
-	if err != nil {
-		return "", err
-	}
-	re := regexp.MustCompile(`<div class="lyrics">(.*?)</div>`)
-	matches := re.FindStringSubmatch(string(body))
-	
-	if len(matches) > 1 {
-		lyrics := html.UnescapeString(matches[1])
-		lyrics = strings.TrimSpace(regexp.MustCompile(`<[^>]*>`).ReplaceAllString(lyrics, ""))
-		
-		if len(lyrics) > 5000 {
-			lyrics = lyrics[:5000] + "... (lyrics truncated)"
-		}
-		
-		return lyrics, nil
-	}
-
-	return "", fmt.Errorf("no lyrics found")
 }
 
 func searchGeniusSongs(query string, page int) ([]Song, int, error) {
@@ -297,54 +308,18 @@ func handleSearch(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func searchYoutubeMusicURL(title, artist string) (string, error) {
-	// Construct search query
-	query := fmt.Sprintf("%s %s official audio", title, artist)
-	encodedQuery := url.QueryEscape(query)
-
-	// YouTube Music search URL (Note: This is a simulated approach)
-	apiURL := fmt.Sprintf("https://www.googleapis.com/youtube/v3/search?part=snippet&q=%s&type=video&key=%s", 
-		encodedQuery, 
-		config.YoutubeAPIKey)
-
-	resp, err := http.Get(apiURL)
-	if err != nil {
-		return "", err
-	}
-	defer resp.Body.Close()
-
-	var youtubeResp struct {
-		Items []struct {
-			ID struct {
-				VideoID string `json:"videoId"`
-			} `json:"id"`
-		} `json:"items"`
-	}
-
-	if err := json.NewDecoder(resp.Body).Decode(&youtubeResp); err != nil {
-		return "", err
-	}
-
-	if len(youtubeResp.Items) > 0 {
-		return fmt.Sprintf("https://www.youtube.com/embed/%s?autoplay=1", 
-			youtubeResp.Items[0].ID.VideoID), nil
-	}
-
-	return "", fmt.Errorf("no music video found")
-}
-
 func handleLyrics(w http.ResponseWriter, r *http.Request) {
 	songID := r.URL.Query().Get("id")
 	songTitle := r.URL.Query().Get("title")
 	artist := r.URL.Query().Get("artist")
 	
-	musicURL, err := searchYoutubeMusicURL(songTitle, artist)
+	musicURL, err := searchSpotifyMusicSource(songTitle, artist)
 	if err != nil {
-		log.Printf("Music URL error: %v", err)
-		musicURL = "" // Fallback to empty
+		log.Printf("Music source error: %v", err)
+		musicURL = "" 
 	}
 
-	lyrics, err := fetchLyrics(songTitle, artist)
+	lyrics, err := fetchLyricsOvh(songTitle, artist)
 	if err != nil {
 		log.Printf("Lyrics fetch error: %v", err)
 		lyrics = "Unable to retrieve lyrics"
@@ -356,12 +331,22 @@ func handleLyrics(w http.ResponseWriter, r *http.Request) {
 		Lyrics   string
 		ID       string
 		MusicURL string
+		ExternalURL struct {
+			Spotify string
+		}
+		PreviewURL string
 	}{
 		Title:    songTitle,
 		Artist:   artist,
 		Lyrics:   lyrics,
 		ID:       songID,
 		MusicURL: musicURL,
+		ExternalURL: struct {
+			Spotify string
+		}{
+			Spotify: "https://open.spotify.com/search/" + url.QueryEscape(songTitle + " " + artist),
+		},
+		PreviewURL: musicURL,
 	}
 
 	if err := lyricsTemplate.Execute(w, data); err != nil {
@@ -398,7 +383,6 @@ func handleAddFavorite(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// Add a handler to get favorites (for potential future use)
 func handleGetFavorites(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(favorites)
@@ -438,19 +422,29 @@ func handleFavorites(w http.ResponseWriter, r *http.Request) {
 }
 
 func init() {
-	funcMap := template.FuncMap{
-		"plus":  func(a int) int { return a + 1 },
-		"minus": func(a int) int { return a - 1 },
-	}
+    funcMap := template.FuncMap{
+        "plus":  func(a int) int { return a + 1 },
+        "minus": func(a int) int { return a - 1 },
+        "urlencodeTitle": func(s string) string {
+            return url.QueryEscape(s)
+        },
+    }
 
-	loadConfig()
+    loadConfig()
 
-	homeTemplate = template.Must(template.ParseFiles("templates/home.html"))
-	searchResultsTemplate = template.Must(template.New("search_results.html").
-		Funcs(funcMap).
-		ParseFiles("templates/search_results.html"))
-	lyricsTemplate = template.Must(template.ParseFiles("templates/lyrics.html"))
-	favoritesTemplate = template.Must(template.ParseFiles("templates/favorites.html"))
+    homeTemplate = template.Must(template.ParseFiles("templates/home.html"))
+    
+    searchResultsTemplate = template.Must(template.New("search_results.html").
+        Funcs(funcMap).
+        ParseFiles("templates/search_results.html"))
+    
+    lyricsTemplate = template.Must(template.New("lyrics.html").
+        Funcs(funcMap).
+        ParseFiles("templates/lyrics.html"))
+    
+    favoritesTemplate = template.Must(template.New("favorites.html").
+        Funcs(funcMap).
+        ParseFiles("templates/favorites.html"))
 }
 
 func main() {
