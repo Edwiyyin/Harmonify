@@ -50,7 +50,7 @@
             background-color: #2563eb;
             color: white;
         }
-        .remove-btn {
+        .remove-favorite {
             background-color: #ef4444;
             color: white;
             border: none;
@@ -58,12 +58,16 @@
             border-radius: 5px;
             cursor: pointer;
         }
+        .back-btn {
+            background-color: #6b7280;
+            color: white;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1 id="your-favorite-songs" class="page-title">Your Favorite Songs</h1>
-
+<a href="/" class="btn back-btn">Back to Search</a>
         {{if .Favorites}}
         <div class="favorites-grid">
             {{range .Favorites}}
