@@ -44,21 +44,26 @@
             border-radius: 8px;
             cursor: pointer;
             transition: background-color 0.3s ease;
+            margin: 20px;
         }
         .search-btn:hover {
             background-color: #1e40af;
         }
-        .favorites-link {
-            display: block;
-            margin-top: 20px;
-        }
-        .favorites-link a {
-            color: #2563eb;
+        .favorites-btn
+        {
+            background-color: #f59e0b;
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            font-size: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
             text-decoration: none;
-            font-weight: bold;
+            margin: 20px;
         }
-        .favorites-link a:hover {
-            text-decoration: underline;
+        .favorites-btn:hover {
+            background-color: #ed8936;
         }
         .description {
             color: #666;
@@ -85,7 +90,7 @@
         </div>
 
         <div class="favorites-link">
-            <a href="/favorites" class="btn btn-primary">View Favorites ♥</a>
+            <a href="/favorites" class="favorites-btn">View Favorites</a>
         </div>
     </div>
 
