@@ -3,81 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <title>Lyrics Finder</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f4f4f4;
-        }
-        .container {
-            background-color: white;
-            border-radius: 8px;
-            padding: 40px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            text-align: center;
-        }
-        .page-title {
-            color: #2563eb;
-            margin-bottom: 30px;
-            font-size: 2.5rem;
-        }
-        .search-container {
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        .search-input {
-            width: 100%;
-            padding: 15px;
-            font-size: 1rem;
-            border: 2px solid #2563eb;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-        .search-btn {
-            background-color: #2563eb;
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            font-size: 1rem;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            margin: 20px;
-        }
-        .search-btn:hover {
-            background-color: #1e40af;
-        }
-        .favorites-btn
-        {
-            background-color: #f59e0b;
-            color: white;
-            border: none;
-            padding: 15px 20px;
-            font-size: 1rem;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            text-decoration: none;
-            margin: 20px;
-        }
-        .favorites-btn:hover {
-            background-color: #ed8936;
-        }
-        .description {
-            color: #666;
-            margin-bottom: 30px;
-            line-height: 1.6;
-        }
-    </style>
+    <link rel="stylesheet" href="/static/css/home.css">
 </head>
 <body>
 
     <div class="container">
-        <div class ="image">
-            <img src="1.png" alt="music icon" width="360px" height="200px">
-        </div>
+            <img src="/static/img/1.png" alt="Harmonify" class="logo">
         <h1 id="lyrics-finder" class="page-title">Harmonify</h1>
 
         <p>Find lyrics to your favorite songs instantly! Simply enter a song title, artist name, or both.</p>
