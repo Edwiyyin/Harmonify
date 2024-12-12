@@ -33,9 +33,6 @@ Harmonify is a web application that allows users to search for song lyrics, disc
 2. Create `config.json` with API credentials:
 ```json
 {
-    "genius_client_id": "YOUR_GENIUS_CLIENT_ID",
-    "genius_client_secret": "YOUR_GENIUS_CLIENT_SECRET",
-    "genius_access_token": "YOUR_GENIUS_ACCESS_TOKEN",
     "spotify_client_id": "YOUR_SPOTIFY_CLIENT_ID",
     "spotify_client_secret": "YOUR_SPOTIFY_CLIENT_SECRET"
 }

@@ -1,7 +1,4 @@
 {
-    "genius_access_token": "N8jZE4cbrBoCw_c4JgWdIy8aWmHfa0x04W97P4wsTydwm-6-EZVwT4T6U2CAdVxO",
-    "genius_client_id": "XJXn4QzMp1I_vqQ-ZEFawmk2dztmsRiatL5lK-wGoMUBDH5fcbVhIRYtsIQWCqfd",
-    "genius_client_secret": "9u_589mqXh2KGmhZ9kMKUcJvSmybdFw3y1CH2dQJV4KGtBThsmYtUBm0MkAB7zQ9hbih6xS5cUcRC64oLqPLjg",
     "spotify_client_id" : "5c9390ec5f6743028632dd0f812bbcd1",
 	"spotify_client_secret" : "21841dfef82e438cb7f0eb87b0b94145"
 }

@@ -15,6 +15,17 @@ import (
 	"time"
 )
 
+var (
+	homeTemplate          *template.Template
+	searchResultsTemplate *template.Template
+	lyricsTemplate        *template.Template
+	favoritesTemplate     *template.Template
+	favorites             []Song
+	config                Config
+	spotifyAccessToken    string
+	spotifyTokenExpiry    time.Time
+)
+
 type Song struct {
 	ID       string `json:"id"`
 	Title    string `json:"title"`
@@ -40,9 +51,6 @@ type GeniusResponse struct {
 }
 
 type Config struct {
-	GeniusClientID      string `json:"genius_client_id"`
-	GeniusClientSecret  string `json:"genius_client_secret"`
-	GeniusAccessToken   string `json:"genius_access_token"`
 	SpotifyClientID     string `json:"spotify_client_id"`
 	SpotifyClientSecret string `json:"spotify_client_secret"`
 }
@@ -60,17 +68,6 @@ type SpotifyTrackResponse struct {
 		} `json:"items"`
 	} `json:"tracks"`
 }
-
-var (
-	homeTemplate          *template.Template
-	searchResultsTemplate *template.Template
-	lyricsTemplate        *template.Template
-	favoritesTemplate     *template.Template
-	favorites             []Song
-	config                Config
-	spotifyAccessToken    string
-	spotifyTokenExpiry    time.Time
-)
 
 func loadConfig() error {
 	configFile, err := os.Open("config.json")
@@ -129,9 +126,11 @@ func searchSpotifyMusicSource(title, artist string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("spotify token error: %v", err)
 	}
+	firstArtist := strings.Split(artist, ",")[0]
+    firstArtist = strings.TrimSpace(firstArtist)
 
-	query := fmt.Sprintf("%s %s", title, artist)
-	encodedQuery := url.QueryEscape(query)
+    query := fmt.Sprintf("%s %s", title, firstArtist)
+    encodedQuery := url.QueryEscape(query)
 
 	req, err := http.NewRequest("GET",
 		fmt.Sprintf("https://api.spotify.com/v1/search?q=%s&type=track&limit=1", encodedQuery),
@@ -150,7 +149,6 @@ func searchSpotifyMusicSource(title, artist string) (string, error) {
 	}
 	defer resp.Body.Close()
 
-	// Log the response status and body for debugging
 	bodyBytes, _ := ioutil.ReadAll(resp.Body)
 	log.Printf("Spotify Response Status: %s", resp.Status)
 	log.Printf("Spotify Response Body: %s", string(bodyBytes))
@@ -203,54 +201,68 @@ func fetchLyricsOvh(title, artist string) (string, error) {
 	return lyrics, nil
 }
 
-func searchGeniusSongs(query string, page int) ([]Song, int, error) {
-	if config.GeniusClientID == "" {
-		if err := loadConfig(); err != nil {
-			return nil, 0, err
-		}
-	}
+func searchSpotifySongs(query string, page int) ([]Song, int, error) {
+    accessToken, err := getSpotifyAccessToken()
+    if err != nil {
+        return nil, 0, fmt.Errorf("spotify token error: %v", err)
+    }
 
-	if config.GeniusAccessToken == "" {
-		return nil, 0, fmt.Errorf("genius API access token is missing")
-	}
+    encodedQuery := url.QueryEscape(query)
+    req, err := http.NewRequest("GET", 
+        fmt.Sprintf("https://api.spotify.com/v1/search?q=%s&type=track&limit=10&offset=%d", 
+        encodedQuery, (page-1)*10), nil)
+    if err != nil {
+        return nil, 0, err
+    }
 
-	encodedQuery := url.QueryEscape(query)
-	apiURL := fmt.Sprintf("https://api.genius.com/search?q=%s&page=%d", encodedQuery, page)
+    req.Header.Add("Authorization", "Bearer "+accessToken)
+    req.Header.Add("Content-Type", "application/json")
 
-	req, err := http.NewRequest("GET", apiURL, nil)
-	if err != nil {
-		return nil, 0, fmt.Errorf("failed to create request: %v", err)
-	}
+    client := &http.Client{Timeout: 10 * time.Second}
+    resp, err := client.Do(req)
+    if err != nil {
+        return nil, 0, err
+    }
+    defer resp.Body.Close()
 
-	req.Header.Add("Authorization", "Bearer "+config.GeniusAccessToken)
-	req.Header.Add("Accept", "application/json")
+    var spotifyResp struct {
+        Tracks struct {
+            Total int `json:"total"`
+            Items []struct {
+                ID     string `json:"id"`
+                Name   string `json:"name"`
+                Artists []struct {
+                    Name string `json:"name"`
+                } `json:"artists"`
+                Album struct {
+                    Images []struct {
+                        URL string `json:"url"`
+                    } `json:"images"`
+                } `json:"album"`
+            } `json:"items"`
+        } `json:"tracks"`
+    }
 
-	client := &http.Client{Timeout: 10 * time.Second}
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, 0, fmt.Errorf("HTTP request failed: %v", err)
-	}
-	defer resp.Body.Close()
+    if err := json.NewDecoder(resp.Body).Decode(&spotifyResp); err != nil {
+        return nil, 0, err
+    }
 
-	var geniusResp GeniusResponse
-	if err := json.NewDecoder(resp.Body).Decode(&geniusResp); err != nil {
-		return nil, 0, fmt.Errorf("failed to parse JSON: %v", err)
-	}
+    var songs []Song
+    for _, track := range spotifyResp.Tracks.Items {
+        var coverURL string
+        if len(track.Album.Images) > 0 {
+            coverURL = track.Album.Images[0].URL
+        }
 
-	var songs []Song
-	for _, hit := range geniusResp.Response.Hits {
-		songs = append(songs, Song{
-			ID:       strconv.Itoa(hit.Result.ID),
-			Title:    hit.Result.Title,
-			Artist:   hit.Result.PrimaryArtist.Name,
-			CoverURL: hit.Result.Song_art_image_url,
-		})
-	}
+        songs = append(songs, Song{
+            ID:       track.ID,
+            Title:    track.Name,
+            Artist:   track.Artists[0].Name,
+            CoverURL: coverURL,
+        })
+    }
 
-	// Hardcode total results to allow pagination
-	const totalResults = 100 // Adjust based on Genius API pagination behavior
-
-	return songs, totalResults, nil
+    return songs, spotifyResp.Tracks.Total, nil
 }
 
 func calculateTotalPages(totalResults int) int {
@@ -279,7 +291,7 @@ func handleSearch(w http.ResponseWriter, r *http.Request) {
 		pageNum = 1
 	}
 
-	songs, totalResults, err := searchGeniusSongs(query, pageNum)
+	songs, totalResults, err := searchSpotifySongs(query, pageNum)
 	if err != nil {
 		log.Printf("Search error: %v", err)
 		http.Error(w, "Error searching songs", http.StatusInternalServerError)
