@@ -47,9 +47,18 @@ body {
 .btn-back {
     background-color: #6b7280;
 }
+.btn-back:hover {
+    background-color: #4b5563;
+}
 .btn-favorites {
     background-color: #f59e0b;
 }
+.btn-favorites:hover {
+    background-color: #ed8936;
+}
 .btn-listen {
     background-color: #10b981;
+}
+.btn-listen:hover {
+    background-color: #047857;
 }

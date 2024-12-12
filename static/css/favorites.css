@@ -44,6 +44,9 @@ body {
     background-color: #2563eb;
     color: white;
 }
+.btn-primary:hover {
+    background-color: #1e40af;
+}
 .remove-favorite {
     background-color: #ef4444;
     color: white;
@@ -51,6 +54,9 @@ body {
     padding: 5px 10px;
     border-radius: 5px;
     cursor: pointer;
+}
+.remove-favorite:hover {
+    background-color: #dc2626;
 }
 .back-btn {
     background-color: #6b7280;

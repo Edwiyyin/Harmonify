@@ -49,17 +49,12 @@ body {
     border-radius: 5px;
     text-align: center;
 }
-.btn-pagination {
-    background-color: #6b7280;
-    color: white;
-}
-.btn-back{
-    background-color: #6b7280;
-    color: white;
-}
 .btn-lyrics {
     background-color: #2563eb;
     color: white;
+}
+.btn-lyrics:hover {
+    background-color: #1e40af;
 }
 .favorite-btn {
     display: inline-block;
@@ -69,6 +64,23 @@ body {
     border: none;
     border-radius: 5px;
     cursor: pointer;
+}
+.favorite-btn:hover {
+    background-color: #ed8936;
+}
+.btn-pagination {
+    background-color: #6b7280;
+    color: white;
+}
+.btn-pagination:hover {
+    background-color: #4b5563;
+}
+.btn-back{
+    background-color: #6b7280;
+    color: white;
+}
+.btn-back:hover {
+    background-color: #4b5563;
 }
 .pagination {
     display: flex;
