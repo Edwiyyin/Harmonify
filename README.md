@@ -65,7 +65,3 @@ Modify `config.json` to update API credentials and settings.
 3. Commit changes
 4. Push to the branch
 5. Create a Pull Request
-
-## License
-
-MIT License

@@ -14,7 +14,7 @@ body {
 }
 .page-title {
     color: #2563eb;
-    margin-bottom: 30px;
+    margin-bottom: -15px;
     font-size: 2.5rem;
 }
 .search-container {
@@ -56,7 +56,6 @@ body {
     cursor: pointer;
     transition: background-color 0.3s ease;
     text-decoration: none;
-    margin: 20px;
 }
 .favorites-btn:hover {
     background-color: #ed8936;

@@ -43,7 +43,6 @@ type Config struct {
 	GeniusClientID      string `json:"genius_client_id"`
 	GeniusClientSecret  string `json:"genius_client_secret"`
 	GeniusAccessToken   string `json:"genius_access_token"`
-	YoutubeAPIKey       string `json:"youtube_api_key"`
 	SpotifyClientID     string `json:"spotify_client_id"`
 	SpotifyClientSecret string `json:"spotify_client_secret"`
 }
