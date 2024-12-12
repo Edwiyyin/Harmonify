@@ -354,7 +354,7 @@ func handleLyrics(w http.ResponseWriter, r *http.Request) {
 		ExternalURL: struct {
 			Spotify string
 		}{
-			Spotify: "https://open.spotify.com/search/" + url.QueryEscape(songTitle+" "+artist),
+			Spotify: "https://open.spotify.com/track/" + songID,
 		},
 		PreviewURL: musicURL,
 	}
