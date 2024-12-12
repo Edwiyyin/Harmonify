@@ -46,6 +46,8 @@ body {
 }
 .btn-primary:hover {
     background-color: #1e40af;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 .remove-favorite {
     background-color: #ef4444;
@@ -57,8 +59,15 @@ body {
 }
 .remove-favorite:hover {
     background-color: #dc2626;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 .back-btn {
     background-color: #6b7280;
     color: white;
+}
+.back-btn:hover {
+    background-color: #4b5563;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }

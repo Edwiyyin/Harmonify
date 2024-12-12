@@ -55,6 +55,8 @@ body {
 }
 .btn-lyrics:hover {
     background-color: #1e40af;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 .favorite-btn {
     display: inline-block;
@@ -67,6 +69,8 @@ body {
 }
 .favorite-btn:hover {
     background-color: #ed8936;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 .btn-pagination {
     background-color: #6b7280;
@@ -74,6 +78,8 @@ body {
 }
 .btn-pagination:hover {
     background-color: #4b5563;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 .btn-back{
     background-color: #6b7280;
@@ -81,6 +87,8 @@ body {
 }
 .btn-back:hover {
     background-color: #4b5563;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 .pagination {
     display: flex;

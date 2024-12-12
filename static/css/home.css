@@ -42,6 +42,8 @@ body {
 }
 .search-btn:hover {
     background-color: #1e40af;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 .favorites-btn
 {
@@ -58,6 +60,8 @@ body {
 }
 .favorites-btn:hover {
     background-color: #ed8936;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 .description {
     color: #666;
