@@ -165,11 +165,11 @@ func searchSpotifyMusicSource(title, artist string) (string, error) {
 	return "", fmt.Errorf("no preview URL found for %s by %s", title, artist)
 }
 
-func fetchLyricsOvh(title, artist string) (string, error) {
+func fetchLyricsOvh(title, songID string) (string, error) {
 	encodedTitle := url.QueryEscape(title)
-	encodedArtist := url.QueryEscape(artist)
+	encodedId := url.QueryEscape(songID)
 
-	apiURL := fmt.Sprintf("https://api.lyrics.ovh/v1/%s/%s", encodedArtist, encodedTitle)
+	apiURL := fmt.Sprintf("https://api.lyrics.ovh/v1/%s/%s",encodedTitle, encodedId)
 
 	resp, err := http.Get(apiURL)
 	if err != nil {
@@ -323,13 +323,15 @@ func handleLyrics(w http.ResponseWriter, r *http.Request) {
 	songTitle := r.URL.Query().Get("title")
 	artist := r.URL.Query().Get("artist")
 
-	musicURL, err := searchSpotifyMusicSource(songTitle, artist)
+	fmt.Printf("Song ID: %s, Song Title: %s, Artist: %s\n", songID, songTitle, artist)
+
+	musicURL, err := searchSpotifyMusicSource(songID, songTitle)
 	if err != nil {
 		log.Printf("Music source error: %v", err)
 		musicURL = ""
 	}
 
-	lyrics, err := fetchLyricsOvh(songTitle, artist)
+	lyrics, err := fetchLyricsOvh(songID, songTitle)
 	if err != nil {
 		log.Printf("Lyrics fetch error: %v", err)
 		lyrics = "Unable to retrieve lyrics"
@@ -372,7 +374,6 @@ func handleAddFavorite(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Check for existing favorites with case-insensitive comparison
 	for _, existingSong := range favorites {
 		if strings.EqualFold(existingSong.ID, song.ID) {
 			w.Header().Set("Content-Type", "application/json")
@@ -384,7 +385,6 @@ func handleAddFavorite(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// Add to favorites
 	favorites = append(favorites, song)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
