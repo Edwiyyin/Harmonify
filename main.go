@@ -436,21 +436,18 @@ func handleAddFavorite(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    // Use details from Spotify to ensure complete song information
     fullSong := Song{
         ID:          song.ID,
         Title:       trackDetails.Name,
         Artist:      trackDetails.Artists[0].Name,
-        CoverURL:    "", // Will be set below
+        CoverURL:    "",
         ReleaseDate: time.Time{},
     }
 
-    // Set cover URL if available
     if len(trackDetails.Album.Images) > 0 {
         fullSong.CoverURL = trackDetails.Album.Images[0].URL
     }
 
-    // Parse release date
     if trackDetails.Album.ReleaseDate != "" {
         fullSong.ReleaseDate = formatReleaseDate(trackDetails.Album.ReleaseDate)
     }
