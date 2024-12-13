@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 	"text/template"
@@ -107,84 +108,15 @@ func getSpotifyAccessToken() (string, error) {
 	return spotifyAccessToken, nil
 }
 
-func searchSpotifyMusicSource(title, artist string) (string, error) {
-	accessToken, err := getSpotifyAccessToken()
-	if err != nil {
-		return "", fmt.Errorf("spotify token error: %v", err)
-	}
-	firstArtist := strings.Split(artist, ",")[0]
-    firstArtist = strings.TrimSpace(firstArtist)
+func sanitizeSearchQuery(query string) string {
+   
+    re := regexp.MustCompile(`\s*\([^)]*\)`)
+    query = re.ReplaceAllString(query, "")
 
-    query := fmt.Sprintf("%s %s", title, firstArtist)
-    encodedQuery := url.QueryEscape(query)
+    parts := strings.Split(query, "-")
+    query = strings.TrimSpace(parts[0])
 
-	req, err := http.NewRequest("GET",
-		fmt.Sprintf("https://api.spotify.com/v1/search?q=%s&type=track&limit=1", encodedQuery),
-		nil)
-	if err != nil {
-		return "", err
-	}
-
-	req.Header.Add("Authorization", "Bearer "+accessToken)
-	req.Header.Add("Content-Type", "application/json")
-
-	client := &http.Client{Timeout: 10 * time.Second}
-	resp, err := client.Do(req)
-	if err != nil {
-		return "", err
-	}
-	defer resp.Body.Close()
-
-	bodyBytes, _ := ioutil.ReadAll(resp.Body)
-	log.Printf("Spotify Response Status: %s", resp.Status)
-	log.Printf("Spotify Response Body: %s", string(bodyBytes))
-
-	var trackResp SpotifyTrackResponse
-	if err := json.Unmarshal(bodyBytes, &trackResp); err != nil {
-		return "", fmt.Errorf("JSON parsing error: %v", err)
-	}
-
-	if len(trackResp.Tracks.Items) > 0 && trackResp.Tracks.Items[0].PreviewURL != "" {
-		return trackResp.Tracks.Items[0].PreviewURL, nil
-	}
-
-	return "", fmt.Errorf("no preview URL found for %s by %s", title, artist)
-}
-
-func fetchLyricsOvh(title, artist string) (string, error) {
-	encodedTitle := url.QueryEscape(title)
-	encodedArtist := url.QueryEscape(artist)
-
-	apiURL := fmt.Sprintf("https://api.lyrics.ovh/v1/%s/%s", encodedArtist, encodedTitle)
-
-	resp, err := http.Get(apiURL)
-	if err != nil {
-		return "", err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("no lyrics found")
-	}
-
-	var lyricsResp struct {
-		Lyrics string `json:"lyrics"`
-	}
-
-	if err := json.NewDecoder(resp.Body).Decode(&lyricsResp); err != nil {
-		return "", err
-	}
-
-	lyrics := strings.TrimSpace(lyricsResp.Lyrics)
-	if lyrics == "" {
-		return "", fmt.Errorf("empty lyrics")
-	}
-
-	if len(lyrics) > 5000 {
-		lyrics = lyrics[:5000] + "... (lyrics truncated)"
-	}
-
-	return lyrics, nil
+    return strings.TrimSpace(query)
 }
 
 func searchSpotifySongs(query string, page int) ([]Song, int, error) {
@@ -193,7 +125,9 @@ func searchSpotifySongs(query string, page int) ([]Song, int, error) {
         return nil, 0, fmt.Errorf("spotify token error: %v", err)
     }
 
-    encodedQuery := url.QueryEscape(query)
+    sanitizedQuery := sanitizeSearchQuery(query)
+    encodedQuery := url.QueryEscape(sanitizedQuery)
+
     req, err := http.NewRequest("GET", 
         fmt.Sprintf("https://api.spotify.com/v1/search?q=%s&type=track&limit=10&offset=%d", 
         encodedQuery, (page-1)*10), nil)
@@ -224,39 +158,124 @@ func searchSpotifySongs(query string, page int) ([]Song, int, error) {
                     Images []struct {
                         URL string `json:"url"`
                     } `json:"images"`
-					ReleaseDate string `json:"release_date"`
-				} `json:"album"`
-			} `json:"items"`
-		} `json:"tracks"`
-	}
+                    ReleaseDate string `json:"release_date"`
+                } `json:"album"`
+            } `json:"items"`
+        } `json:"tracks"`
+    }
 
     if err := json.NewDecoder(resp.Body).Decode(&spotifyResp); err != nil {
         return nil, 0, err
     }
 
     var songs []Song
-	for _, track := range spotifyResp.Tracks.Items {
-		var coverURL string
-		var releaseDate time.Time
+    for _, track := range spotifyResp.Tracks.Items {
+        var coverURL string
+        var releaseDate time.Time
 
-		if len(track.Album.Images) > 0 {
-			coverURL = track.Album.Images[0].URL
-		}
+        if len(track.Album.Images) > 0 {
+            coverURL = track.Album.Images[0].URL
+        }
 
-		if track.Album.ReleaseDate != "" {
-			releaseDate = formatReleaseDate(track.Album.ReleaseDate)
-		}
+        if track.Album.ReleaseDate != "" {
+            releaseDate = formatReleaseDate(track.Album.ReleaseDate)
+        }
 
-		songs = append(songs, Song{
-			ID:          track.ID,
-			Title:       track.Name,
-			Artist:      track.Artists[0].Name,
-			CoverURL:    coverURL,
-			ReleaseDate: releaseDate,
-		})
-	}
+        songs = append(songs, Song{
+            ID:          track.ID,
+            Title:       track.Name,
+            Artist:      track.Artists[0].Name,
+            CoverURL:    coverURL,
+            ReleaseDate: releaseDate,
+        })
+    }
 
-	return songs, spotifyResp.Tracks.Total, nil
+    return songs, spotifyResp.Tracks.Total, nil
+}
+
+func fetchLyricsOvh(title, artist string) (string, error) {
+    sanitizedTitle := sanitizeSearchQuery(title)
+    
+    encodedTitle := url.QueryEscape(sanitizedTitle)
+    encodedArtist := url.QueryEscape(artist)
+
+    apiURL := fmt.Sprintf("https://api.lyrics.ovh/v1/%s/%s", encodedArtist, encodedTitle)
+
+    resp, err := http.Get(apiURL)
+    if err != nil {
+        return "", err
+    }
+    defer resp.Body.Close()
+
+    if resp.StatusCode != http.StatusOK {
+        return "", fmt.Errorf("no lyrics found")
+    }
+
+    var lyricsResp struct {
+        Lyrics string `json:"lyrics"`
+    }
+
+    if err := json.NewDecoder(resp.Body).Decode(&lyricsResp); err != nil {
+        return "", err
+    }
+
+    lyrics := strings.TrimSpace(lyricsResp.Lyrics)
+    if lyrics == "" {
+        return "", fmt.Errorf("empty lyrics")
+    }
+
+    if len(lyrics) > 5000 {
+        lyrics = lyrics[:5000] + "... (lyrics truncated)"
+    }
+
+    return lyrics, nil
+}
+
+func searchSpotifyMusicSource(title, artist string) (string, error) {
+
+    sanitizedTitle := sanitizeSearchQuery(title)
+    
+    accessToken, err := getSpotifyAccessToken()
+    if err != nil {
+        return "", fmt.Errorf("spotify token error: %v", err)
+    }
+    firstArtist := strings.Split(artist, ",")[0]
+    firstArtist = strings.TrimSpace(firstArtist)
+
+    query := fmt.Sprintf("%s %s", sanitizedTitle, firstArtist)
+    encodedQuery := url.QueryEscape(query)
+
+    req, err := http.NewRequest("GET",
+        fmt.Sprintf("https://api.spotify.com/v1/search?q=%s&type=track&limit=1", encodedQuery),
+        nil)
+    if err != nil {
+        return "", err
+    }
+
+    req.Header.Add("Authorization", "Bearer "+accessToken)
+    req.Header.Add("Content-Type", "application/json")
+
+    client := &http.Client{Timeout: 10 * time.Second}
+    resp, err := client.Do(req)
+    if err != nil {
+        return "", err
+    }
+    defer resp.Body.Close()
+
+    bodyBytes, _ := ioutil.ReadAll(resp.Body)
+    log.Printf("Spotify Response Status: %s", resp.Status)
+    log.Printf("Spotify Response Body: %s", string(bodyBytes))
+
+    var trackResp SpotifyTrackResponse
+    if err := json.Unmarshal(bodyBytes, &trackResp); err != nil {
+        return "", fmt.Errorf("JSON parsing error: %v", err)
+    }
+
+    if len(trackResp.Tracks.Items) > 0 && trackResp.Tracks.Items[0].PreviewURL != "" {
+        return trackResp.Tracks.Items[0].PreviewURL, nil
+    }
+
+    return "", fmt.Errorf("no preview URL found for %s by %s", sanitizedTitle, artist)
 }
 
 func calculateTotalPages(totalResults int) int {
