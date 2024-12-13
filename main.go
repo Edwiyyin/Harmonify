@@ -529,9 +529,9 @@ func init() {
 
 	homeTemplate = template.Must(template.ParseFiles("templates/home.html"))
 
-	searchResultsTemplate = template.Must(template.New("search_results.html").
+	searchResultsTemplate = template.Must(template.New("search.html").
 		Funcs(funcMap).
-		ParseFiles("templates/search_results.html"))
+		ParseFiles("templates/search.html"))
 
 	lyricsTemplate = template.Must(template.New("lyrics.html").
 		Funcs(funcMap).
