@@ -32,22 +32,8 @@ type Song struct {
 	Artist   string `json:"artist"`
 	Lyrics   string `json:"lyrics,omitempty"`
 	CoverURL string `json:"cover_url,omitempty"`
-}
-
-type GeniusResponse struct {
-	Response struct {
-		Hits []struct {
-			Result struct {
-				ID            int    `json:"id"`
-				Title         string `json:"title"`
-				PrimaryArtist struct {
-					Name string `json:"name"`
-				} `json:"primary_artist"`
-				URL                string `json:"url"`
-				Song_art_image_url string `json:"song_art_image_url"`
-			} `json:"result"`
-		} `json:"hits"`
-	} `json:"response"`
+	ReleaseDate time.Time `json:"release_date,omitempty"`
+	PreviewURL string `json:"preview_url,omitempty"`
 }
 
 type Config struct {
@@ -238,36 +224,59 @@ func searchSpotifySongs(query string, page int) ([]Song, int, error) {
                     Images []struct {
                         URL string `json:"url"`
                     } `json:"images"`
-                } `json:"album"`
-            } `json:"items"`
-        } `json:"tracks"`
-    }
+					ReleaseDate string `json:"release_date"`
+				} `json:"album"`
+			} `json:"items"`
+		} `json:"tracks"`
+	}
 
     if err := json.NewDecoder(resp.Body).Decode(&spotifyResp); err != nil {
         return nil, 0, err
     }
 
     var songs []Song
-    for _, track := range spotifyResp.Tracks.Items {
-        var coverURL string
-        if len(track.Album.Images) > 0 {
-            coverURL = track.Album.Images[0].URL
-        }
+	for _, track := range spotifyResp.Tracks.Items {
+		var coverURL string
+		var releaseDate time.Time
 
-        songs = append(songs, Song{
-            ID:       track.ID,
-            Title:    track.Name,
-            Artist:   track.Artists[0].Name,
-            CoverURL: coverURL,
-        })
-    }
+		if len(track.Album.Images) > 0 {
+			coverURL = track.Album.Images[0].URL
+		}
 
-    return songs, spotifyResp.Tracks.Total, nil
+		if track.Album.ReleaseDate != "" {
+			releaseDate = formatReleaseDate(track.Album.ReleaseDate)
+		}
+
+		songs = append(songs, Song{
+			ID:          track.ID,
+			Title:       track.Name,
+			Artist:      track.Artists[0].Name,
+			CoverURL:    coverURL,
+			ReleaseDate: releaseDate,
+		})
+	}
+
+	return songs, spotifyResp.Tracks.Total, nil
 }
 
 func calculateTotalPages(totalResults int) int {
 	const resultsPerPage = 10
 	return (totalResults + resultsPerPage - 1) / resultsPerPage
+}
+
+func formatReleaseDate(dateStr string) time.Time {
+	parsedDate, err := time.Parse("2006-01-02", dateStr)
+	if err != nil {
+		return time.Time{}
+	}
+	return parsedDate
+}
+
+func (s Song) FormattedReleaseDate() string {
+	if s.ReleaseDate.IsZero() {
+		return "Unknown"
+	}
+	return s.ReleaseDate.Format("January 2, 2006")
 }
 
 func handleHome(w http.ResponseWriter, r *http.Request) {
