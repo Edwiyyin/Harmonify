@@ -375,30 +375,93 @@ func handleLyrics(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleAddFavorite(w http.ResponseWriter, r *http.Request) {
-	var song Song
-	if err := json.NewDecoder(r.Body).Decode(&song); err != nil {
-		http.Error(w, "Invalid request", http.StatusBadRequest)
-		return
-	}
-	for _, existingSong := range favorites {
-		if strings.EqualFold(existingSong.ID, song.ID) {
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"success": false,
-				"message": "Song already in favorites",
-			})
-			return
-		}
-	}
+    var song Song
+    if err := json.NewDecoder(r.Body).Decode(&song); err != nil {
+        http.Error(w, "Invalid request", http.StatusBadRequest)
+        return
+    }
+    
+    // Check for duplicate before adding
+    for _, existingSong := range favorites {
+        if strings.EqualFold(existingSong.ID, song.ID) {
+            w.Header().Set("Content-Type", "application/json")
+            json.NewEncoder(w).Encode(map[string]interface{}{
+                "success": false,
+                "message": "Song already in favorites",
+            })
+            return
+        }
+    }
+    
+    // Fetch additional details to ensure complete song information
+    accessToken, err := getSpotifyAccessToken()
+    if err != nil {
+        http.Error(w, "Spotify token error", http.StatusInternalServerError)
+        return
+    }
 
-	favorites = append(favorites, song)
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"success": true,
-		"message": "Song added to favorites",
-	})
+    req, err := http.NewRequest("GET", 
+        fmt.Sprintf("https://api.spotify.com/v1/tracks/%s", song.ID), nil)
+    if err != nil {
+        http.Error(w, "Failed to create request", http.StatusInternalServerError)
+        return
+    }
+
+    req.Header.Add("Authorization", "Bearer "+accessToken)
+    req.Header.Add("Content-Type", "application/json")
+
+    client := &http.Client{Timeout: 10 * time.Second}
+    resp, err := client.Do(req)
+    if err != nil {
+        http.Error(w, "Failed to fetch track details", http.StatusInternalServerError)
+        return
+    }
+    defer resp.Body.Close()
+
+    var trackDetails struct {
+        Name   string `json:"name"`
+        Artists []struct {
+            Name string `json:"name"`
+        } `json:"artists"`
+        Album struct {
+            Images []struct {
+                URL string `json:"url"`
+            } `json:"images"`
+            ReleaseDate string `json:"release_date"`
+        } `json:"album"`
+    }
+
+    if err := json.NewDecoder(resp.Body).Decode(&trackDetails); err != nil {
+        http.Error(w, "Failed to parse track details", http.StatusInternalServerError)
+        return
+    }
+
+    // Use details from Spotify to ensure complete song information
+    fullSong := Song{
+        ID:          song.ID,
+        Title:       trackDetails.Name,
+        Artist:      trackDetails.Artists[0].Name,
+        CoverURL:    "", // Will be set below
+        ReleaseDate: time.Time{},
+    }
+
+    // Set cover URL if available
+    if len(trackDetails.Album.Images) > 0 {
+        fullSong.CoverURL = trackDetails.Album.Images[0].URL
+    }
+
+    // Parse release date
+    if trackDetails.Album.ReleaseDate != "" {
+        fullSong.ReleaseDate = formatReleaseDate(trackDetails.Album.ReleaseDate)
+    }
+
+    favorites = append(favorites, fullSong)
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(map[string]interface{}{
+        "success": true,
+        "message": "Song added to favorites",
+    })
 }
-
 func handleGetFavorites(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(favorites)

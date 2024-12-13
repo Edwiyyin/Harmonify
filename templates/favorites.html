@@ -9,15 +9,27 @@
     <div class="container">
         <h1 id="your-favorite-songs" class="page-title">Your Favorite Songs</h1>
         <a href="/" class="btn back-btn">Back to Search</a>
+        
         {{if .Favorites}}
-        <div class="favorites-grid">
+        <div class="results-grid">
             {{range .Favorites}}
             <div class="song-card" data-song-id="{{.ID}}">
-                <h2>{{.Title}}</h2>
-                <p>{{.Artist}}</p>
+                <div class="song-cover">
+                    {{if .CoverURL}} 
+                        <img src="{{.CoverURL}}" alt="Album Cover" style="max-width: 150px; max-height: 150px; object-fit: cover; border-radius: 8px; margin-bottom: 10px;">
+                    {{else}}
+                        <div class="no-cover-placeholder" style="width: 150px; height: 150px; background-color: #e0e0e0; display: flex; align-items: center; justify-content: center; border-radius: 8px; margin-bottom: 10px;">No Cover</div>
+                    {{end}}
+                </div>
 
-                <div class="song-actions">
-                    <a href="/lyrics?id={{.ID}}&title={{urlencodeTitle .Title}}&artist={{urlencodeTitle .Artist}}" class="btn btn-primary">View Lyrics</a>
+                <div class="song-details">
+                    <h2 style="margin: 0 0 10px 0; font-size: 1.2em; color: #2563eb;">{{.Title}}</h2>
+                    <p style="margin: 0 0 5px 0; color: #4b5563;">{{.Artist}}</p>
+                    <p class="release-date" style="margin: 0; font-size: 0.9em; color: #6b7280;">Released: {{.FormattedReleaseDate}}</p>
+                </div>
+
+                <div class="song-actions" style="display: flex; justify-content: space-between; margin-top: 15px;">
+                    <a href="/lyrics?id={{.ID}}&title={{urlencodeTitle .Title}}&artist={{urlencodeTitle .Artist}}" class="btn btn-primary" style="flex-grow: 1; margin-right: 10px;">View Lyrics</a>
                     <span class="remove-favorite">✖</span>
                 </div>
             </div>
@@ -54,7 +66,7 @@
                         
                         const remainingFavorites = document.querySelectorAll('.song-card');
                         if (remainingFavorites.length === 0) {
-                            const grid = document.querySelector('.favorites-grid');
+                            const grid = document.querySelector('.results-grid');
                             grid.innerHTML = `
                                 <div class="no-favorites">
                                     No favorite songs yet. Start searching and add some!
