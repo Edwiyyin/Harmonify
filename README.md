@@ -9,7 +9,7 @@ Harmonify is a web application that allows users to search for song lyrics, disc
 - Song Lyrics Search
 - Music Preview Integration
 - Favorites Management
-- Spotify and Genius API Support
+- Spotify API Support
 - Responsive Web Design
 
 ## Tech Stack
