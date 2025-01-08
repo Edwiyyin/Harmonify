@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"os"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"text/template"
@@ -54,6 +55,13 @@ type SpotifyTrackResponse struct {
 			PreviewURL string `json:"preview_url"`
 		} `json:"items"`
 	} `json:"tracks"`
+}
+
+type SearchFilters struct {
+    StartDate   string `json:"startDate"`
+    EndDate     string `json:"endDate"`
+    SortBy      string `json:"sortBy"`
+    SortOrder   string `json:"sortOrder"`
 }
 
 func loadConfig() error {
@@ -119,7 +127,7 @@ func sanitizeSearchQuery(query string) string {
     return strings.TrimSpace(query)
 }
 
-func searchSpotifySongs(query string, page int) ([]Song, int, error) {
+func searchSpotifySongs(query string, page int, filters SearchFilters) ([]Song, int, error) {
     accessToken, err := getSpotifyAccessToken()
     if err != nil {
         return nil, 0, fmt.Errorf("spotify token error: %v", err)
@@ -129,8 +137,8 @@ func searchSpotifySongs(query string, page int) ([]Song, int, error) {
     encodedQuery := url.QueryEscape(sanitizedQuery)
 
     req, err := http.NewRequest("GET", 
-        fmt.Sprintf("https://api.spotify.com/v1/search?q=%s&type=track&limit=10&offset=%d", 
-        encodedQuery, (page-1)*10), nil)
+        fmt.Sprintf("https://api.spotify.com/v1/search?q=%s&type=track&limit=50&offset=%d", 
+        encodedQuery, (page-1)*50), nil)
     if err != nil {
         return nil, 0, err
     }
@@ -169,6 +177,9 @@ func searchSpotifySongs(query string, page int) ([]Song, int, error) {
     }
 
     var songs []Song
+    startDate, _ := time.Parse("2006-01-02", filters.StartDate)
+    endDate, _ := time.Parse("2006-01-02", filters.EndDate)
+
     for _, track := range spotifyResp.Tracks.Items {
         var coverURL string
         var releaseDate time.Time
@@ -181,6 +192,13 @@ func searchSpotifySongs(query string, page int) ([]Song, int, error) {
             releaseDate = formatReleaseDate(track.Album.ReleaseDate)
         }
 
+        if !startDate.IsZero() && releaseDate.Before(startDate) {
+            continue
+        }
+        if !endDate.IsZero() && releaseDate.After(endDate) {
+            continue
+        }
+
         songs = append(songs, Song{
             ID:          track.ID,
             Title:       track.Name,
@@ -190,7 +208,40 @@ func searchSpotifySongs(query string, page int) ([]Song, int, error) {
         })
     }
 
-    return songs, spotifyResp.Tracks.Total, nil
+    switch filters.SortBy {
+    case "title":
+        sort.Slice(songs, func(i, j int) bool {
+            if filters.SortOrder == "desc" {
+                return songs[i].Title > songs[j].Title
+            }
+            return songs[i].Title < songs[j].Title
+        })
+    case "artist":
+        sort.Slice(songs, func(i, j int) bool {
+            if filters.SortOrder == "desc" {
+                return songs[i].Artist > songs[j].Artist
+            }
+            return songs[i].Artist < songs[j].Artist
+        })
+    case "date":
+        sort.Slice(songs, func(i, j int) bool {
+            if filters.SortOrder == "desc" {
+                return songs[i].ReleaseDate.After(songs[j].ReleaseDate)
+            }
+            return songs[i].ReleaseDate.Before(songs[j].ReleaseDate)
+        })
+    }
+
+    start := (page - 1) * 10
+    end := start + 10
+    if end > len(songs) {
+        end = len(songs)
+    }
+    if start > len(songs) {
+        return []Song{}, len(songs), nil
+    }
+
+    return songs[start:end], len(songs), nil
 }
 
 func fetchLyricsOvh(title, artist string) (string, error) {
@@ -311,39 +362,52 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleSearch(w http.ResponseWriter, r *http.Request) {
-	query := r.URL.Query().Get("query")
-	page := r.URL.Query().Get("page")
+    query := r.URL.Query().Get("query")
+    page := r.URL.Query().Get("page")
+    startDate := r.URL.Query().Get("startDate")
+    endDate := r.URL.Query().Get("endDate")
+    sortBy := r.URL.Query().Get("sortBy")
+    sortOrder := r.URL.Query().Get("sortOrder")
 
-	pageNum, _ := strconv.Atoi(page)
-	if pageNum == 0 {
-		pageNum = 1
-	}
+    pageNum, _ := strconv.Atoi(page)
+    if pageNum == 0 {
+        pageNum = 1
+    }
 
-	songs, totalResults, err := searchSpotifySongs(query, pageNum)
-	if err != nil {
-		log.Printf("Search error: %v", err)
-		http.Error(w, "Error searching songs", http.StatusInternalServerError)
-		return
-	}
+    filters := SearchFilters{
+        StartDate: startDate,
+        EndDate:   endDate,
+        SortBy:    sortBy,
+        SortOrder: sortOrder,
+    }
 
-	data := struct {
-		Songs        []Song
-		Query        string
-		CurrentPage  int
-		TotalPages   int
-		TotalResults int
-	}{
-		Songs:        songs,
-		Query:        query,
-		CurrentPage:  pageNum,
-		TotalPages:   calculateTotalPages(totalResults),
-		TotalResults: totalResults,
-	}
+    songs, totalResults, err := searchSpotifySongs(query, pageNum, filters)
+    if err != nil {
+        log.Printf("Search error: %v", err)
+        http.Error(w, "Error searching songs", http.StatusInternalServerError)
+        return
+    }
 
-	if err := searchResultsTemplate.Execute(w, data); err != nil {
-		log.Printf("Template execution error: %v", err)
-		http.Error(w, "Error rendering results", http.StatusInternalServerError)
-	}
+    data := struct {
+        Songs        []Song
+        Query        string
+        CurrentPage  int
+        TotalPages   int
+        TotalResults int
+        Filters      SearchFilters
+    }{
+        Songs:        songs,
+        Query:        query,
+        CurrentPage:  pageNum,
+        TotalPages:   calculateTotalPages(totalResults),
+        TotalResults: totalResults,
+        Filters:      filters,
+    }
+
+    if err := searchResultsTemplate.Execute(w, data); err != nil {
+        log.Printf("Template execution error: %v", err)
+        http.Error(w, "Error rendering results", http.StatusInternalServerError)
+    }
 }
 
 func handleLyrics(w http.ResponseWriter, r *http.Request) {
@@ -400,7 +464,6 @@ func handleAddFavorite(w http.ResponseWriter, r *http.Request) {
         return
     }
     
-    // Check for duplicate before adding
     for _, existingSong := range favorites {
         if strings.EqualFold(existingSong.ID, song.ID) {
             w.Header().Set("Content-Type", "application/json")
@@ -411,8 +474,7 @@ func handleAddFavorite(w http.ResponseWriter, r *http.Request) {
             return
         }
     }
-    
-    // Fetch additional details to ensure complete song information
+
     accessToken, err := getSpotifyAccessToken()
     if err != nil {
         http.Error(w, "Spotify token error", http.StatusInternalServerError)

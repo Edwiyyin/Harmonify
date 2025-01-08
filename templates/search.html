@@ -8,6 +8,39 @@
 <body>
     <div class="container">
         <h1 id="search-results-for-{{.Query}}" class="page-title">Search Results for "{{.Query}}"</h1>
+        
+        <div class="filters">
+            <form id="filterForm" method="GET" action="/search">
+                <input type="hidden" name="query" value="{{.Query}}">
+                <div class="filter-group">
+                    <div class="filter-item">
+                        <label for="startDate">From Date:</label>
+                        <input type="date" id="startDate" name="startDate" value="{{.Filters.StartDate}}">
+                    </div>
+                    <div class="filter-item">
+                        <label for="endDate">To Date:</label>
+                        <input type="date" id="endDate" name="endDate" value="{{.Filters.EndDate}}">
+                    </div>
+                    <div class="filter-item">
+                        <label for="sortBy">Sort By:</label>
+                        <select id="sortBy" name="sortBy">
+                            <option value="date" {{if eq .Filters.SortBy "date"}}selected{{end}}>Release Date</option>
+                            <option value="title" {{if eq .Filters.SortBy "title"}}selected{{end}}>Title</option>
+                            <option value="artist" {{if eq .Filters.SortBy "artist"}}selected{{end}}>Artist</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label for="sortOrder">Order:</label>
+                        <select id="sortOrder" name="sortOrder">
+                            <option value="asc" {{if eq .Filters.SortOrder "asc"}}selected{{end}}>Ascending</option>
+                            <option value="desc" {{if eq .Filters.SortOrder "desc"}}selected{{end}}>Descending</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="apply-filters">Apply Filters</button>
+            </form>
+        </div>
+
         <div class="results-grid">
             {{range .Songs}}
             <div class="song-card" data-song-id="{{.ID}}">
@@ -35,11 +68,11 @@
 
         <div class="pagination">
             {{if gt .CurrentPage 1}}
-                <a href="/search?query={{.Query}}&page={{minus .CurrentPage}}" class="btn btn-pagination">Previous</a>
+                <a href="/search?query={{.Query}}&page={{minus .CurrentPage}}&startDate={{.Filters.StartDate}}&endDate={{.Filters.EndDate}}&sortBy={{.Filters.SortBy}}&sortOrder={{.Filters.SortOrder}}" class="btn btn-pagination">Previous</a>
             {{end}}
-              <a href="/" class="btn btn-back">Go Home</a>
+            <a href="/" class="btn btn-back">Go Home</a>
             {{if lt .CurrentPage .TotalPages}}
-                <a href="/search?query={{.Query}}&page={{plus .CurrentPage}}" class="btn btn-pagination">Next</a>
+                <a href="/search?query={{.Query}}&page={{plus .CurrentPage}}&startDate={{.Filters.StartDate}}&endDate={{.Filters.EndDate}}&sortBy={{.Filters.SortBy}}&sortOrder={{.Filters.SortOrder}}" class="btn btn-pagination">Next</a>
             {{end}}
         </div>
         
