@@ -17,7 +17,6 @@ Harmonify is a web application that allows users to search for song lyrics, disc
 - Backend: Go (Golang)
 - Frontend: HTML, CSS, JavaScript
 - APIs:
-  - Genius API (Song Search)
   - Spotify API (Music Previews)
   - Lyrics.ovh API (Lyrics Retrieval)
 
@@ -25,7 +24,6 @@ Harmonify is a web application that allows users to search for song lyrics, disc
 
 - Go 1.16+
 - Spotify Developer Account
-- Genius Developer Account
 
 ## Setup
 
