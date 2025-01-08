@@ -3,8 +3,7 @@ package main
 import (
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
-	"io/ioutil"
+    "fmt"
 	"log"
 	"net/http"
 	"net/url"
@@ -36,6 +35,7 @@ type Song struct {
 	CoverURL string `json:"cover_url,omitempty"`
 	ReleaseDate time.Time `json:"release_date,omitempty"`
 	PreviewURL string `json:"preview_url,omitempty"`
+    Duration    int       `json:"duration"`
 }
 
 type Config struct {
@@ -53,8 +53,9 @@ type SpotifyTrackResponse struct {
 	Tracks struct {
 		Items []struct {
 			PreviewURL string `json:"preview_url"`
-		} `json:"items"`
-	} `json:"tracks"`
+            Duration int `json:"duration_ms"`
+        } `json:"items"`
+    } `json:"tracks"`
 }
 
 type SearchFilters struct {
@@ -62,6 +63,8 @@ type SearchFilters struct {
     EndDate     string `json:"endDate"`
     SortBy      string `json:"sortBy"`
     SortOrder   string `json:"sortOrder"`
+    MinDuration  int    `json:"minDuration"`
+    MaxDuration  int    `json:"maxDuration"`
 }
 
 func loadConfig() error {
@@ -78,6 +81,14 @@ func loadConfig() error {
 
 	return nil
 }
+
+func (s Song) FormattedDuration() string {
+    seconds := s.Duration / 1000
+    minutes := seconds / 60
+    remainingSeconds := seconds % 60
+    return fmt.Sprintf("%d:%02d", minutes, remainingSeconds)
+}
+
 
 func getSpotifyAccessToken() (string, error) {
 	if spotifyAccessToken != "" && time.Now().Before(spotifyTokenExpiry) {
@@ -168,6 +179,7 @@ func searchSpotifySongs(query string, page int, filters SearchFilters) ([]Song, 
                     } `json:"images"`
                     ReleaseDate string `json:"release_date"`
                 } `json:"album"`
+                Duration int `json:"duration_ms"`
             } `json:"items"`
         } `json:"tracks"`
     }
@@ -199,12 +211,20 @@ func searchSpotifySongs(query string, page int, filters SearchFilters) ([]Song, 
             continue
         }
 
+        if filters.MinDuration > 0 && track.Duration < filters.MinDuration*1000 {
+            continue
+        }
+        if filters.MaxDuration > 0 && track.Duration > filters.MaxDuration*1000 {
+            continue
+        }
+
         songs = append(songs, Song{
             ID:          track.ID,
             Title:       track.Name,
             Artist:      track.Artists[0].Name,
             CoverURL:    coverURL,
             ReleaseDate: releaseDate,
+            Duration:    track.Duration,
         })
     }
 
@@ -313,13 +333,10 @@ func searchSpotifyMusicSource(title, artist string) (string, error) {
     }
     defer resp.Body.Close()
 
-    bodyBytes, _ := ioutil.ReadAll(resp.Body)
-    log.Printf("Spotify Response Status: %s", resp.Status)
-    log.Printf("Spotify Response Body: %s", string(bodyBytes))
-
     var trackResp SpotifyTrackResponse
-    if err := json.Unmarshal(bodyBytes, &trackResp); err != nil {
-        return "", fmt.Errorf("JSON parsing error: %v", err)
+    if err := json.NewDecoder(resp.Body).Decode(&trackResp); err != nil {
+        log.Printf("Spotify Response Status: %s, Error: %v", resp.Status, err)
+        return "", fmt.Errorf("failed to decode Spotify response: %v", err)
     }
 
     if len(trackResp.Tracks.Items) > 0 && trackResp.Tracks.Items[0].PreviewURL != "" {
@@ -330,8 +347,11 @@ func searchSpotifyMusicSource(title, artist string) (string, error) {
 }
 
 func calculateTotalPages(totalResults int) int {
-	const resultsPerPage = 10
-	return (totalResults + resultsPerPage - 1) / resultsPerPage
+    if totalResults <= 0 {
+        return 1
+    }
+    const resultsPerPage = 10
+    return (totalResults + resultsPerPage - 1) / resultsPerPage
 }
 
 func formatReleaseDate(dateStr string) time.Time {
@@ -368,6 +388,8 @@ func handleSearch(w http.ResponseWriter, r *http.Request) {
     endDate := r.URL.Query().Get("endDate")
     sortBy := r.URL.Query().Get("sortBy")
     sortOrder := r.URL.Query().Get("sortOrder")
+    minDuration, _ := strconv.Atoi(r.URL.Query().Get("minDuration"))
+    maxDuration, _ := strconv.Atoi(r.URL.Query().Get("maxDuration"))
 
     pageNum, _ := strconv.Atoi(page)
     if pageNum == 0 {
@@ -379,6 +401,8 @@ func handleSearch(w http.ResponseWriter, r *http.Request) {
         EndDate:   endDate,
         SortBy:    sortBy,
         SortOrder: sortOrder,
+        MinDuration: minDuration,
+        MaxDuration: maxDuration,
     }
 
     songs, totalResults, err := searchSpotifySongs(query, pageNum, filters)
@@ -501,6 +525,7 @@ func handleAddFavorite(w http.ResponseWriter, r *http.Request) {
 
     var trackDetails struct {
         Name   string `json:"name"`
+        Duration int    `json:"duration_ms"`
         Artists []struct {
             Name string `json:"name"`
         } `json:"artists"`
@@ -523,6 +548,7 @@ func handleAddFavorite(w http.ResponseWriter, r *http.Request) {
         Artist:      trackDetails.Artists[0].Name,
         CoverURL:    "",
         ReleaseDate: time.Time{},
+        Duration:    trackDetails.Duration,
     }
 
     if len(trackDetails.Album.Images) > 0 {
@@ -579,29 +605,40 @@ func handleFavorites(w http.ResponseWriter, r *http.Request) {
 }
 
 func init() {
-	funcMap := template.FuncMap{
-		"plus":  func(a int) int { return a + 1 },
-		"minus": func(a int) int { return a - 1 },
-		"urlencodeTitle": func(s string) string {
-			return url.QueryEscape(s)
-		},
-	}
+    funcMap := template.FuncMap{
+        "plus":  func(a int) int { return a + 1 },
+        "minus": func(a int) int { return a - 1 },
+        "urlencodeTitle": func(s string) string {
+            return url.QueryEscape(s)
+        },
+        "urlencode": func(s string) string {
+            return url.QueryEscape(s)
+        },
+        "div": func(a, b int) int { return a / b },
+        "mod": func(a, b int) int { return a % b },
+        "durationMinutes": func(seconds int) int { 
+            return seconds / 60 
+        },
+        "durationSeconds": func(seconds int) int { 
+            return seconds % 60 
+        },
+    }
 
-	loadConfig()
+    loadConfig()
 
-	homeTemplate = template.Must(template.ParseFiles("templates/home.html"))
+    homeTemplate = template.Must(template.ParseFiles("templates/home.html"))
 
-	searchResultsTemplate = template.Must(template.New("search.html").
-		Funcs(funcMap).
-		ParseFiles("templates/search.html"))
+    searchResultsTemplate = template.Must(template.New("search.html").
+        Funcs(funcMap).
+        ParseFiles("templates/search.html"))
 
-	lyricsTemplate = template.Must(template.New("lyrics.html").
-		Funcs(funcMap).
-		ParseFiles("templates/lyrics.html"))
+    lyricsTemplate = template.Must(template.New("lyrics.html").
+        Funcs(funcMap).
+        ParseFiles("templates/lyrics.html"))
 
-	favoritesTemplate = template.Must(template.New("favorites.html").
-		Funcs(funcMap).
-		ParseFiles("templates/favorites.html"))
+    favoritesTemplate = template.Must(template.New("favorites.html").
+        Funcs(funcMap).
+        ParseFiles("templates/favorites.html"))
 }
 
 func main() {

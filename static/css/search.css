@@ -135,3 +135,21 @@ body {
 .apply-filters:hover {
     background: #45a049;
 }
+.duration-filter {
+    margin: 10px 0;
+}
+
+.duration-inputs {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.duration-inputs input[type="number"] {
+    width: 60px;
+    padding: 5px;
+}
+
+.duration-inputs span {
+    font-weight: bold;
+}
