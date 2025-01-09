@@ -89,6 +89,16 @@ func (s Song) FormattedDuration() string {
     return fmt.Sprintf("%d:%02d", minutes, remainingSeconds)
 }
 
+func sanitizeSearchQuery(query string) string {
+   
+    re := regexp.MustCompile(`\s*\([^)]*\)`)
+    query = re.ReplaceAllString(query, "")
+
+    parts := strings.Split(query, "-")
+    query = strings.TrimSpace(parts[0])
+
+    return strings.TrimSpace(query)
+}
 
 func getSpotifyAccessToken() (string, error) {
 	if spotifyAccessToken != "" && time.Now().Before(spotifyTokenExpiry) {
@@ -125,17 +135,6 @@ func getSpotifyAccessToken() (string, error) {
 	spotifyTokenExpiry = time.Now().Add(time.Duration(tokenResp.ExpiresIn) * time.Second)
 
 	return spotifyAccessToken, nil
-}
-
-func sanitizeSearchQuery(query string) string {
-   
-    re := regexp.MustCompile(`\s*\([^)]*\)`)
-    query = re.ReplaceAllString(query, "")
-
-    parts := strings.Split(query, "-")
-    query = strings.TrimSpace(parts[0])
-
-    return strings.TrimSpace(query)
 }
 
 func searchSpotifySongs(query string, page int, filters SearchFilters) ([]Song, int, error) {
