@@ -90,7 +90,7 @@ func (s Song) FormattedDuration() string {
 }
 
 func sanitizeSearchQuery(query string) string {
-   
+
     re := regexp.MustCompile(`\s*\([^)]*\)`)
     query = re.ReplaceAllString(query, "")
 

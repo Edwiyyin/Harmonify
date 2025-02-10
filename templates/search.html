@@ -25,16 +25,16 @@
                         <label for="minDuration">Min Duration:</label>
                         <div class="duration-inputs">
                             <input type="number" id="minDurationMinutes" 
-                                   min="0" max="59" 
-                                   placeholder="Min"
-                                   oninput="updateDuration('min')"
-                                   value="{{durationMinutes .Filters.MinDuration}}">
+                                min="0" max="59" 
+                                placeholder="Min"
+                                oninput="updateDuration('min')"
+                                value="{{durationMinutes .Filters.MinDuration}}">
                             <span>:</span>
                             <input type="number" id="minDurationSeconds" 
-                                   min="0" max="59" 
-                                   placeholder="Sec"
-                                   oninput="updateDuration('min')"
-                                   value="{{durationSeconds .Filters.MinDuration}}">
+                                min="0" max="59" 
+                                placeholder="Sec"
+                                oninput="updateDuration('min')"
+                                value="{{durationSeconds .Filters.MinDuration}}">
                             <input type="hidden" id="minDuration" name="minDuration" value="{{.Filters.MinDuration}}">
                         </div>
                     </div>
@@ -43,16 +43,16 @@
                         <label for="maxDuration">Max Duration:</label>
                         <div class="duration-inputs">
                             <input type="number" id="maxDurationMinutes" 
-                                   min="0" max="59" 
-                                   placeholder="Min"
-                                   oninput="updateDuration('max')"
-                                   value="{{durationMinutes .Filters.MaxDuration}}">
+                                min="0" max="59" 
+                                placeholder="Min"
+                                oninput="updateDuration('max')"
+                                value="{{durationMinutes .Filters.MaxDuration}}">
                             <span>:</span>
                             <input type="number" id="maxDurationSeconds" 
-                                   min="0" max="59" 
-                                   placeholder="Sec"
-                                   oninput="updateDuration('max')"
-                                   value="{{durationSeconds .Filters.MaxDuration}}">
+                                min="0" max="59" 
+                                placeholder="Sec"
+                                oninput="updateDuration('max')"
+                                value="{{durationSeconds .Filters.MaxDuration}}">
                             <input type="hidden" id="maxDuration" name="maxDuration" value="{{.Filters.MaxDuration}}">
                         </div>
                     </div>

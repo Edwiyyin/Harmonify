@@ -3,13 +3,14 @@ body {
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
-    background-color: #f4f4f4;
+    background-color: #1a1a1a;
+    color: #e0e0e0;
 }
 .container {
-    background-color: white;
+    background-color: #2d2d2d;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
     border-radius: 8px;
     padding: 20px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 .page-title {
     text-align: center;
