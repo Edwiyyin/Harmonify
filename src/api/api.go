@@ -9,8 +9,9 @@ import (
 	"sort"
 	"strings"
 	"time"
-	"regexp"
 	"os"
+
+    "harmonify/src/calc"
 	
 )
 
@@ -118,7 +119,7 @@ func SearchSpotifySongs(query string, page int, filters SearchFilters) ([]Song, 
         return nil, 0, fmt.Errorf("spotify token error: %v", err)
     }
 
-    sanitizedQuery := sanitizeSearchQuery(query)
+    sanitizedQuery := calc.SanitizeSearchQuery(query)
     encodedQuery := url.QueryEscape(sanitizedQuery)
 
     req, err := http.NewRequest("GET", 
@@ -241,7 +242,7 @@ func SearchSpotifySongs(query string, page int, filters SearchFilters) ([]Song, 
 }
 
 func FetchLyricsOvh(title, artist string) (string, error) {
-    sanitizedTitle := sanitizeSearchQuery(title)
+    sanitizedTitle := calc.SanitizeSearchQuery(title)
     
     encodedTitle := url.QueryEscape(sanitizedTitle)
     encodedArtist := url.QueryEscape(artist)
@@ -284,7 +285,7 @@ func SearchSpotifyMusicSource(title, artist string) (string, error) {
         return "", fmt.Errorf("spotify token error: %v", err)
     }
 
-    sanitizedTitle := sanitizeSearchQuery(title)
+    sanitizedTitle := calc.SanitizeSearchQuery(title)
     firstArtist := strings.Split(artist, ",")[0]
     firstArtist = strings.TrimSpace(firstArtist)
 
@@ -325,25 +326,6 @@ func (s Song) FormattedDuration() string {
     minutes := seconds / 60
     remainingSeconds := seconds % 60
     return fmt.Sprintf("%d:%02d", minutes, remainingSeconds)
-}
-
-func sanitizeSearchQuery(query string) string {
-
-    re := regexp.MustCompile(`\s*\([^)]*\)`)
-    query = re.ReplaceAllString(query, "")
-
-    parts := strings.Split(query, "-")
-    query = strings.TrimSpace(parts[0])
-
-    return strings.TrimSpace(query)
-}
-
-func CalculateTotalPages(totalResults int) int {
-    if totalResults <= 0 {
-        return 1
-    }
-    const resultsPerPage = 10
-    return (totalResults + resultsPerPage - 1) / resultsPerPage
 }
 
 func FormatReleaseDate(dateStr string) time.Time {

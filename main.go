@@ -9,6 +9,7 @@ import (
 
 	"harmonify/src/handlers"
 	"harmonify/src/api"
+	"harmonify/src/calc"
 )
 
 
@@ -18,11 +19,11 @@ func init() {
 	}
 
 	funcMap := template.FuncMap{
-        "minus":           handlers.Minus,
-        "plus":            handlers.Plus,
-        "urlencodeTitle":  handlers.UrlencodeTitle,
-        "durationMinutes": handlers.DurationMinutes,
-        "durationSeconds": handlers.DurationSeconds,
+        "minus":           calc.Minus,
+        "plus":            calc.Plus,
+        "urlencodeTitle":  calc.UrlencodeTitle,
+        "durationMinutes": calc.DurationMinutes,
+        "durationSeconds": calc.DurationSeconds,
 	}
 
 	handlers.HomeTemplate = template.Must(template.New("home.html").Funcs(funcMap).ParseFiles("templates/home.html"))

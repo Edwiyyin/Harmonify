@@ -6,12 +6,12 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-	"net/url"
 	"strconv"
 	"strings"
 	"time"
 
 	"harmonify/src/api"
+    "harmonify/src/calc"
 )
 
 var (
@@ -94,8 +94,8 @@ func HandleSearch(w http.ResponseWriter, r *http.Request) {
         EndDate:     r.URL.Query().Get("endDate"),
         SortBy:      r.URL.Query().Get("sortBy"),
         SortOrder:   r.URL.Query().Get("sortOrder"),
-        MinDuration: parseDuration(r.URL.Query().Get("minDuration")),
-        MaxDuration: parseDuration(r.URL.Query().Get("maxDuration")),
+        MinDuration: calc.ParseDuration(r.URL.Query().Get("minDuration")),
+        MaxDuration: calc.ParseDuration(r.URL.Query().Get("maxDuration")),
     }
 
     songs, totalResults, err := api.SearchSpotifySongs(query, pageNum, filters)
@@ -123,8 +123,8 @@ func HandleSearch(w http.ResponseWriter, r *http.Request) {
         TotalPages:   totalPages,
         TotalResults: totalResults,
         Filters:      filters,
-        DurationMinutes: DurationMinutes,
-        DurationSeconds: DurationSeconds,
+        DurationMinutes: calc.DurationMinutes,
+        DurationSeconds: calc.DurationSeconds,
     }
 
     if err := SearchResultsTemplate.Execute(w, data); err != nil {
@@ -141,7 +141,6 @@ func HandleAddFavorite(w http.ResponseWriter, r *http.Request) {
         return
     }
     
-    // Check if song already exists in global Favorites
     for _, existingSong := range Favorites {
         if strings.EqualFold(existingSong.ID, song.ID) {
             w.Header().Set("Content-Type", "application/json")
@@ -213,7 +212,6 @@ func HandleAddFavorite(w http.ResponseWriter, r *http.Request) {
         fullSong.ReleaseDate = api.FormatReleaseDate(trackDetails.Album.ReleaseDate)
     }
 
-    // Add to global Favorites
     Favorites = append(Favorites, fullSong)
     
     w.Header().Set("Content-Type", "application/json")
@@ -249,33 +247,5 @@ func HandleRemoveFavorite(w http.ResponseWriter, r *http.Request) {
 
     w.Header().Set("Content-Type", "application/json")
     json.NewEncoder(w).Encode(map[string]bool{"success": false})
-}
-
-func parseDuration(durationStr string) int {
-    if durationStr == "" {
-        return 0
-    }
-    duration, _ := strconv.Atoi(durationStr)
-    return duration
-}
-
-func Minus(a, b int) int {
-    return a - b
-}
-
-func Plus(a, b int) int {
-    return a + b
-}
-
-func UrlencodeTitle(s string) string {
-    return url.QueryEscape(s)
-}
-
-func DurationMinutes(duration int) int {
-    return duration / 60
-}
-
-func DurationSeconds(duration int) int {
-    return duration % 60
 }
 
