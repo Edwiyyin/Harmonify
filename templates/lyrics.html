@@ -1,3 +1,4 @@
+<!-- Update the lyrics.html template -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,11 +16,15 @@
 
             <div class="btn-container">
                 <a href="#" class="btn btn-favorites">Add to Favorites</a>
-                <a href="{{.ExternalURL.Spotify}}" class="btn btn-listen" target="_blank">Listen 🎵</a>
+                {{if .PreviewURL}}
+                <audio id="preview-player" controls>
+                    <source src="{{.PreviewURL}}" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio>
+                {{end}}
+                <a href="{{.SpotifyURL}}" class="btn btn-listen" target="_blank">Open in Spotify 🎵</a>
                 <a href="javascript:history.back()" class="btn btn-back">Go Back</a>
             </div>
-
-            <div id="youtube-container"></div>
         </div>
     </div>
 
@@ -53,28 +58,6 @@
                 alert('Failed to add to favorites');
             }
         });
-
-        async function searchYouTubeMusic() {
-            try {
-                const response = await fetch(`/search-youtube?title=${encodeURIComponent(title)}&artist=${encodeURIComponent(artist)}`);
-                const data = await response.json();
-                
-                if (data.videoUrl) {
-                    const youtubeContainer = document.getElementById('youtube-container');
-                    const musicPlayer = document.createElement('iframe');
-                    musicPlayer.src = data.videoUrl;
-                    musicPlayer.width = '100%';
-                    musicPlayer.height = '315';
-                    musicPlayer.allowFullscreen = true;
-                    
-                    youtubeContainer.appendChild(musicPlayer);
-                }
-            } catch (error) {
-                console.error('YouTube search error:', error);
-            }
-        }
-
-        searchYouTubeMusic();
     });
     </script>
 </body>

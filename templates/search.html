@@ -21,41 +21,42 @@
                         <label for="endDate">To Date:</label>
                         <input type="date" id="endDate" name="endDate" value="{{.Filters.EndDate}}">
                     </div>
-                    <div class="filter-item duration-filter">
-                        <label for="minDuration">Min Duration:</label>
-                        <div class="duration-inputs">
-                            <input type="number" id="minDurationMinutes" 
-                                min="0" max="59" 
-                                placeholder="Min"
-                                oninput="updateDuration('min')"
-                                value="{{durationMinutes .Filters.MinDuration}}">
-                            <span>:</span>
-                            <input type="number" id="minDurationSeconds" 
-                                min="0" max="59" 
-                                placeholder="Sec"
-                                oninput="updateDuration('min')"
-                                value="{{durationSeconds .Filters.MinDuration}}">
-                            <input type="hidden" id="minDuration" name="minDuration" value="{{.Filters.MinDuration}}">
-                        </div>
-                    </div>
+<div class="filter-item duration-filter">
+    <label for="minDuration">Min Duration:</label>
+    <div class="duration-inputs">
+        <input type="number" id="minDurationMinutes" 
+            min="0" max="59" 
+            placeholder="Min"
+            oninput="updateDuration('min')"
+            value="{{call .DurationMinutes .Filters.MinDuration}}">
+        <span>:</span>
+        <input type="number" id="minDurationSeconds" 
+            min="0" max="59" 
+            placeholder="Sec"
+            oninput="updateDuration('min')"
+            value="{{call .DurationSeconds .Filters.MinDuration}}">
+        <input type="hidden" id="minDuration" name="minDuration" value="{{.Filters.MinDuration}}">
+    </div>
+</div>
+
+<div class="filter-item duration-filter">
+    <label for="maxDuration">Max Duration:</label>
+    <div class="duration-inputs">
+        <input type="number" id="maxDurationMinutes" 
+            min="0" max="59" 
+            placeholder="Min"
+            oninput="updateDuration('max')"
+            value="{{call .DurationMinutes .Filters.MaxDuration}}">
+        <span>:</span>
+        <input type="number" id="maxDurationSeconds" 
+            min="0" max="59" 
+            placeholder="Sec"
+            oninput="updateDuration('max')"
+            value="{{call .DurationSeconds .Filters.MaxDuration}}">
+        <input type="hidden" id="maxDuration" name="maxDuration" value="{{.Filters.MaxDuration}}">
+    </div>
+</div>
                     
-                    <div class="filter-item duration-filter">
-                        <label for="maxDuration">Max Duration:</label>
-                        <div class="duration-inputs">
-                            <input type="number" id="maxDurationMinutes" 
-                                min="0" max="59" 
-                                placeholder="Min"
-                                oninput="updateDuration('max')"
-                                value="{{durationMinutes .Filters.MaxDuration}}">
-                            <span>:</span>
-                            <input type="number" id="maxDurationSeconds" 
-                                min="0" max="59" 
-                                placeholder="Sec"
-                                oninput="updateDuration('max')"
-                                value="{{durationSeconds .Filters.MaxDuration}}">
-                            <input type="hidden" id="maxDuration" name="maxDuration" value="{{.Filters.MaxDuration}}">
-                        </div>
-                    </div>
                     <div class="filter-item">
                         <label for="sortBy">Sort By:</label>
                         <select id="sortBy" name="sortBy">
@@ -95,7 +96,7 @@
                 </div>
             
                 <div class="song-actions">
-                    <a href="/lyrics?id={{.ID}}&title={{.Title | urlencode}}&artist={{.Artist | urlencode}}" class="btn btn-lyrics">View Lyrics</a>
+                    <a href="/lyrics?id={{.ID}}&title={{urlquery .Title}}&artist={{urlquery .Artist}}" class="btn btn-lyrics">View Lyrics</a>
                     <span class="favorite-btn">♥</span>
                 </div>
             </div>
@@ -103,11 +104,11 @@
         </div>
         <div class="pagination">
             {{if gt .CurrentPage 1}}
-                <a href="/search?query={{.Query}}&page={{minus .CurrentPage}}&startDate={{.Filters.StartDate}}&endDate={{.Filters.EndDate}}&sortBy={{.Filters.SortBy}}&sortOrder={{.Filters.SortOrder}}&minDuration={{.Filters.MinDuration}}&maxDuration={{.Filters.MaxDuration}}" class="btn btn-pagination">Previous</a>
+                <a href="/search?query={{.Query}}&page={{minus .CurrentPage 1}}&startDate={{.Filters.StartDate}}&endDate={{.Filters.EndDate}}&sortBy={{.Filters.SortBy}}&sortOrder={{.Filters.SortOrder}}&minDuration={{.Filters.MinDuration}}&maxDuration={{.Filters.MaxDuration}}" class="btn btn-pagination">Previous</a>
             {{end}}
             <a href="/" class="btn btn-back">Go Home</a>
             {{if lt .CurrentPage .TotalPages}}
-                <a href="/search?query={{.Query}}&page={{plus .CurrentPage}}&startDate={{.Filters.StartDate}}&endDate={{.Filters.EndDate}}&sortBy={{.Filters.SortBy}}&sortOrder={{.Filters.SortOrder}}&minDuration={{.Filters.MinDuration}}&maxDuration={{.Filters.MaxDuration}}" class="btn btn-pagination">Next</a>
+                <a href="/search?query={{.Query}}&page={{plus .CurrentPage 1}}&startDate={{.Filters.StartDate}}&endDate={{.Filters.EndDate}}&sortBy={{.Filters.SortBy}}&sortOrder={{.Filters.SortOrder}}&minDuration={{.Filters.MinDuration}}&maxDuration={{.Filters.MaxDuration}}" class="btn btn-pagination">Next</a>
             {{end}}
         </div>
         
