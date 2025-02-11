@@ -1,5 +1,5 @@
 # Harmonify 🎵
-![alt text](static/img/1.png)
+![alt text](static/img/2.png)
 ## Overview
 
 Harmonify is a web application that allows users to search for song lyrics, discover music, and manage their favorite songs. The application integrates multiple music APIs to provide a rich music exploration experience.
