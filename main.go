@@ -44,7 +44,8 @@ func main() {
 	http.HandleFunc("/favorites", handlers.HandleFavorites)
 	http.HandleFunc("/add-favorite", handlers.HandleAddFavorite)
 	http.HandleFunc("/remove-favorite", handlers.HandleRemoveFavorite)
-
+	http.HandleFunc("/get-lyrics-text", handlers.HandleGetLyricsText)
+	
 	server := &http.Server{
 		Addr:         ":8080",
 		ReadTimeout:  10 * time.Second,

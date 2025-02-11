@@ -68,17 +68,20 @@ func HandleLyrics(w http.ResponseWriter, r *http.Request) {
     }
 }
 
-func HandleFavorites(w http.ResponseWriter, r *http.Request) {
-	data := struct {
-		Favorites []api.Song
-	}{
-		Favorites: Favorites,
-	}
+func HandleGetLyricsText(w http.ResponseWriter, r *http.Request) {
+    if r.Method != http.MethodGet {
+        http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+        return
+    }
 
-	if err := FavoritesTemplate.Execute(w, data); err != nil {
-		log.Printf("Error rendering favorites template: %v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-	}
+    lyrics := r.URL.Query().Get("lyrics")
+    if lyrics == "" {
+        http.Error(w, "No lyrics provided", http.StatusBadRequest)
+        return
+    }
+
+    w.Header().Set("Content-Type", "text/plain")
+    w.Write([]byte(lyrics))
 }
 
 func HandleSearch(w http.ResponseWriter, r *http.Request) {
@@ -133,6 +136,20 @@ func HandleSearch(w http.ResponseWriter, r *http.Request) {
         return
     }
 }
+
+func HandleFavorites(w http.ResponseWriter, r *http.Request) {
+	data := struct {
+		Favorites []api.Song
+	}{
+		Favorites: Favorites,
+	}
+
+	if err := FavoritesTemplate.Execute(w, data); err != nil {
+		log.Printf("Error rendering favorites template: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+	}
+}
+
 
 func HandleAddFavorite(w http.ResponseWriter, r *http.Request) {
     var song api.Song

@@ -74,7 +74,7 @@ body {
 .favorite-btn {
     display: inline-block;
     padding: 5px 10px;
-    background-color: #d97706;  /* Darker orange */
+    background-color: #d97706;
     color: white;
     border: none;
     border-radius: 5px;
@@ -121,7 +121,6 @@ body {
     margin-top: 10px;
 }
 
-/* Filters Section */
 .filters {
     background: #2d2d2d;
     padding: 20px;
@@ -182,7 +181,7 @@ body {
 }
 
 .duration-filter {
-    margin: 0;  /* Remove margin to align with other filters */
+    margin: 0;
 }
 
 .duration-inputs {
@@ -197,7 +196,7 @@ body {
     border: 1px solid #4a5568;
     background-color: #374151;
     color: #e0e0e0;
-    width: 60px;  /* Make duration inputs smaller */
+    width: 60px;
 }
 
 .duration-inputs span {
@@ -205,16 +204,14 @@ body {
     color: #e0e0e0;
 }
 
-/* Focus states */
 .filter-item select:focus,
 .filter-item input:focus,
 .duration-inputs input[type="number"]:focus {
     outline: none;
-    border-color: #3b82f6;  /* Darker blue */
+    border-color: #3b82f6;
     box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
 }
 
-/* Placeholder text */
 .filter-item input::placeholder,
 .duration-inputs input::placeholder {
     color: #9ca3af;

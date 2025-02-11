@@ -87,7 +87,23 @@ body {
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
-/* YouTube container styles */
+.btn-copy {
+    background-color: #663399;
+    border: none;
+    cursor: pointer;
+    color: rgb(255, 255, 255);
+}
+
+.btn-copy:hover {
+    background-color: #4B0082;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.btn-copy:active {
+    transform: translateY(0);
+}
+
 #youtube-container {
     margin-top: 30px;
     background-color: #3d3d3d;
@@ -101,7 +117,6 @@ body {
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
-/* Scrollbar styles for the lyrics */
 .lyrics-pre::-webkit-scrollbar {
     width: 12px;
     height: 12px;
@@ -122,13 +137,11 @@ body {
     background-color: #374151;
 }
 
-/* Focus states for buttons */
 .btn:focus {
     outline: none;
     box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2);
 }
 
-/* Selection color for lyrics */
 .lyrics-pre::selection {
     background-color: rgba(96, 165, 250, 0.3);
     color: #ffffff;

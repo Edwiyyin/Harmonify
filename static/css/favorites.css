@@ -70,9 +70,6 @@ body {
 .btn-lyrics {
     background-color: #2563eb;
     color: white;
-    padding: 5px 10px;
-    text-decoration: none;
-    border-radius: 5px;
 }
 .btn-lyrics:hover {
     background-color: #1e40af;
@@ -111,7 +108,7 @@ body {
     font-size: 0.9rem;
 }
 .release-date {
-    color: #666;
+    color: #e0e0e0;
     font-size: 0.8rem;
 }
 .song-actions {
