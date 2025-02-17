@@ -47,7 +47,9 @@ go run main.go
 - `/`: Home page with search functionality
 - `/search`: Display search results
 - `/lyrics`: Show song lyrics and additional details
-- `/favorites`: Manage favorite songs
+- `/playlist`: Manage playlist songs
+- `/playlist-lyrics`: Same as /lyrics but for /playlist
+
 
 ## Configuration
 

@@ -5,9 +5,12 @@
     <title>{{.Title}} - Lyrics</title>
     <link rel="stylesheet" href="/static/css/lyrics.css">
     <link rel="icon" href="/static/img/2.png">
+    <link rel="stylesheet" href="/static/css/toast.css">
 </head>
 <body>
     <div class="container">
+        <div id="toast" class="toast"></div>
+        
         <div class="lyrics-card">
             <h1 id="title" class="song-title">{{.Title}}</h1>
             <h2 id="artist" class="song-artist">{{.Artist}}</h2>
@@ -15,16 +18,21 @@
             <pre class="lyrics-pre">{{.Lyrics}}</pre>
 
             <div class="btn-container">
-                <a href="#" class="btn btn-favorites">Add to Favorites</a>
+                <a href="{{.SpotifyURL}}" class="btn btn-listen" target="_blank">Open in Spotify </a>
+                <button type="button" class="btn btn-copy">Copy Lyrics</button>
+                {{if .InPlaylist}}
+                <a href="/remove-from-playlist?id={{.ID}}" class="btn btn-remove-playlist">Remove from Playlist</a>
+                {{else}}
+                <a href="/add-to-playlist?id={{.ID}}&title={{urlquery .Title}}&artist={{urlquery .Artist}}" class="btn btn-add-playlist">Add to Playlist</a>
+                {{end}}
+                
                 {{if .PreviewURL}}
                 <audio id="preview-player" controls>
                     <source src="{{.PreviewURL}}" type="audio/mpeg">
                     Your browser does not support the audio element.
                 </audio>
                 {{end}}
-                <button type="button" class="btn btn-copy">Copy Lyrics</button>
-                <a href="{{.SpotifyURL}}" class="btn btn-listen" target="_blank">Open in Spotify 🎵</a>
-                <a href="javascript:history.back()" class="btn btn-back">Go Back</a>
+                <a href="/search?query={{.Query}}&page={{.Page}}" class="btn btn-back">Go Back</a>
             </div>
         </div>
     </div>

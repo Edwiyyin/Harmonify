@@ -8,6 +8,7 @@
 </head>
 <body>
     <div class="container">
+        <div id="toast" class="toast"></div>
         <h1 id="search-results-for-{{.Query}}" class="page-title">Search Results for "{{.Query}}"</h1>
         
         <div class="filters">
@@ -79,29 +80,27 @@
         </div>
 
         <div class="results-grid">
-            {{range .Songs}}
-            <div class="song-card" data-song-id="{{.ID}}">
+            {{ range .Songs }}
+            <div class="song-card">
                 <div class="song-cover">
-                    {{if .CoverURL}} 
+                    {{if .CoverURL}}
                         <img src="{{.CoverURL}}" alt="Album Cover" class="cover-image">
                     {{else}}
                         <div class="no-cover-placeholder">No Cover</div>
                     {{end}}
                 </div>
-            
                 <div class="song-details">
                     <h2>{{.Title}}</h2>
                     <p>{{.Artist}}</p>
                     <p class="release-date">Released: {{.FormattedReleaseDate}}</p>
                     <p class="duration">Duration: {{.FormattedDuration}}</p>
                 </div>
-            
                 <div class="song-actions">
-                    <a href="/lyrics?id={{.ID}}&title={{urlquery .Title}}&artist={{urlquery .Artist}}" class="btn btn-lyrics">View Lyrics</a>
-                    <span class="favorite-btn">♥</span>
+                    <a href="/lyrics?id={{.ID}}&title={{.Title}}&artist={{.Artist}}&query={{$.Query}}&page={{$.CurrentPage}}" class="btn btn-lyrics">View Lyrics</a>
+                    <a href="/add-to-playlist?id={{.ID}}&title={{.Title}}&artist={{.Artist}}&query={{$.Query}}&page={{$.CurrentPage}}" class="btn btn-add-playlist">Add to Playlist</a>
                 </div>
             </div>
-            {{end}}
+        {{ end }}
         </div>
         <div class="pagination">
             {{if gt .CurrentPage 1}}

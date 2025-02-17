@@ -34,6 +34,11 @@ body {
     text-align: center;
 }
 
+.song-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+}
+
 .cover-image {
     max-width: 100%;
     height: 200px;
@@ -71,7 +76,7 @@ body {
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
-.favorite-btn {
+.btn-add-playlist {
     display: inline-block;
     padding: 5px 10px;
     background-color: #d97706;
@@ -81,7 +86,7 @@ body {
     cursor: pointer;
 }
 
-.favorite-btn:hover {
+.btn-add-playlist:hover {
     background-color: #b45309;
     transform: translateY(-2px);
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
@@ -165,7 +170,7 @@ body {
 }
 
 .apply-filters {
-    background: #2563eb;  /* Darker blue */
+    background: #2563eb; 
     color: white;
     padding: 10px 20px;
     border: none;
@@ -215,4 +220,40 @@ body {
 .filter-item input::placeholder,
 .duration-inputs input::placeholder {
     color: #9ca3af;
+}
+
+.toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 12px 24px;
+    border-radius: 6px;
+    color: white;
+    font-weight: 500;
+    z-index: 1000;
+    display: none;
+    animation: slideIn 0.3s ease-out;
+}
+
+.toast.success {
+    background-color: #22c55e; /* Green for success */
+}
+
+.toast.info {
+    background-color: #3b82f6; /* Blue for info */
+}
+
+.toast.error {
+    background-color: #ef4444; /* Red for error */
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
 }

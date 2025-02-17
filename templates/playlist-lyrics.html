@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Playlist Lyrics - {{.Title}}</title>
+    <link rel="stylesheet" href="/static/css/lyrics.css">
+    <link rel="icon" href="/static/img/2.png">
+</head>
+<body>
+    <div class="container">
+        <div id="toast" class="toast"></div>
+        <h1 class="song-title">{{.Title}}</h1>
+        <p class="song-artist">{{.Artist}}</p>
+        
+        <div class="lyrics-pre">{{.Lyrics}}</div>
+
+        <div class="btn-container">
+            <a href="{{.SpotifyURL}}" class="btn btn-listen" target="_blank">Open in Spotify </a>
+            <button class="btn btn-copy">Copy Lyrics</button>
+            {{if .InPlaylist}}
+                <a href="/remove-from-playlist?id={{.ID}}" class="btn btn-remove-playlist">Remove from Playlist</a>
+            {{else}}
+                <a href="/add-to-playlist?id={{.ID}}&title={{.Title}}&artist={{.Artist}}&query={{.Query}}&page={{.Page}}" class="btn btn-add-playlist">Add to Playlist</a>
+            {{end}}
+            <a href="/playlist" class="btn btn-back">Back to Playlist</a>
+        </div>
+    </div>
+    <script src="/static/js/lyrics.js"></script>
+</body>
+</html>
