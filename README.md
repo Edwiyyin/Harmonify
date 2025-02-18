@@ -50,6 +50,38 @@ go run main.go
 - `/playlist`: Manage playlist songs
 - `/playlist-lyrics`: Same as /lyrics but for /playlist
 
+## Structure
+
+HARMONIFY/
+│── src/
+│   ├── api/
+│   │   ├── api.go
+│   │   ├── apicalc.go
+│   ├── calc/
+│   │   ├── calc.go
+│   ├── handlers/
+│   │   ├── handle.go
+│── static/
+│   ├── css/
+│   │   ├── home.css
+│   │   ├── lyrics.css
+│   │   ├── playlist.css
+│   │   ├── search.css
+│   ├── img/
+│   ├── js/
+│── templates/
+│   ├── home.html
+│   ├── lyrics.html
+│   ├── playlist-lyrics.html
+│   ├── playlist.html
+│   ├── search.html
+│── .gitattributes
+│── config.json
+│── go.mod
+│── main.go
+│── playlist.json
+│── README.md
+
 
 ## Configuration
 
