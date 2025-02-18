@@ -52,8 +52,9 @@ go run main.go
 
 ## Structure
 
+```
 HARMONIFY/
-│── src/
+├── src/
 │   ├── api/
 │   │   ├── api.go
 │   │   ├── apicalc.go
@@ -61,7 +62,7 @@ HARMONIFY/
 │   │   ├── calc.go
 │   ├── handlers/
 │   │   ├── handle.go
-│── static/
+├── static/
 │   ├── css/
 │   │   ├── home.css
 │   │   ├── lyrics.css
@@ -69,19 +70,20 @@ HARMONIFY/
 │   │   ├── search.css
 │   ├── img/
 │   ├── js/
-│── templates/
+├── templates/
 │   ├── home.html
 │   ├── lyrics.html
 │   ├── playlist-lyrics.html
 │   ├── playlist.html
 │   ├── search.html
-│── .gitattributes
-│── config.json
-│── go.mod
-│── main.go
-│── playlist.json
-│── README.md
+├── .gitattributes
+├── config.json
+├── go.mod
+├── main.go
+├── playlist.json
+├── README.md
 
+```
 
 ## Configuration
 
