@@ -25,5 +25,5 @@ func (s Song) FormattedReleaseDate() string {
 	if s.ReleaseDate.IsZero() {
 		return "Unknown"
 	}
-	return s.ReleaseDate.Format("January 2, 2006")
+	return s.ReleaseDate.Format("2 January 2006")
 }
