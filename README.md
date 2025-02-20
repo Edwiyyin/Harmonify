@@ -49,6 +49,8 @@ go run main.go
 - `/lyrics`: Show song lyrics and additional details
 - `/playlist`: Manage playlist songs
 - `/playlist-lyrics`: Same as /lyrics but for /playlist
+- `/error`: Indicate error in /search
+- `/faq`: For FAQ
 
 ## Structure
 
@@ -64,6 +66,7 @@ HARMONIFY/
 │   │   ├── handle.go
 ├── static/
 │   ├── css/
+│   │   ├── faq.css
 │   │   ├── home.css
 │   │   ├── lyrics.css
 │   │   ├── playlist.css
@@ -75,6 +78,8 @@ HARMONIFY/
 │   │   ├── playlist.js
 │   │   ├── search.js
 ├── templates/
+│   ├── error.html
+│   ├── faq.html
 │   ├── home.html
 │   ├── lyrics.html
 │   ├── playlist-lyrics.html
