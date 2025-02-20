@@ -106,7 +106,7 @@ body {
 }
 
 .btn-remove-playlist {
-    background-color: #ef4444; /* Red for remove button */
+    background-color: #ef4444;
     color: white;
     padding: 8px 16px;
     border-radius: 6px;
@@ -119,7 +119,7 @@ body {
 }
 
 .btn-remove-playlist:hover {
-    background-color: #dc2626; /* Darker red on hover */
+    background-color: #dc2626;
     transform: translateY(-2px);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
@@ -176,15 +176,15 @@ body {
 }
 
 .toast.success {
-    background-color: #22c55e; /* Green for success */
+    background-color: #22c55e;
 }
 
 .toast.info {
-    background-color: #3b82f6; /* Blue for info */
+    background-color: #3b82f6;
 }
 
 .toast.error {
-    background-color: #ef4444; /* Red for error */
+    background-color: #ef4444;
 }
 
 @keyframes slideIn {

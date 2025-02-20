@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Page Not Found</title>
+    <link rel="stylesheet" href="/static/css/search.css">
+    <link rel="icon" href="/static/img/2.png">
+</head>
+<body>
+    <div class="container">
+        <div id="toast" class="toast"></div>
+        <div class="error-message">
+            <h1 class="error-code">404</h1>
+            <h2 class="error-title">Page Not Found</h2>
+            <p class="error-description">The page you're looking for doesn't exist or has been moved.</p>
+        </div>
+        <div class="error-details">
+            <p>Your request:</p>
+            <p>Page {{.RequestedPage}} of 100 total pages</p>
+            <p>Search query: "{{.Query}}"</p>
+        </div>
+        <div class="btn-container">
+            <a href="/search?query={{.Query}}&page=1" class="btn btn-pagination">First Page</a>
+            <a href="/search?query={{.Query}}&page=100" class="btn btn-pagination">Last Page</a>
+            <a href="/" class="btn btn-back">Home</a>          
+            <a href="javascript:history.back()" class="btn btn-back">Go Back</a>
+        </div>
+    </div>
+</body>
+</html>

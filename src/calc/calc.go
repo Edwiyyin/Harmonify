@@ -22,7 +22,7 @@ func CalculateTotalPages(totalResults int) int {
     if totalResults <= 0 {
         return 1
     }
-    const resultsPerPage = 10
+    const resultsPerPage = 8
     return (totalResults + resultsPerPage - 1) / resultsPerPage
 }
 

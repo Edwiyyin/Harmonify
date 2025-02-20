@@ -6,13 +6,12 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"os"
 	"sort"
 	"strings"
 	"time"
-	"os"
 
-    "harmonify/src/calc"
-	
+	"harmonify/src/calc"
 )
 
 type SpotifyTokenResponse struct {
@@ -112,40 +111,51 @@ func GetSpotifyAccessToken() (string, error) {
 
 	return spotifyAccessToken, nil
 }
+const (
+    MaxTotalResults = 1000
+    ResultsPerPage  = 8
+)
 
 func SearchSpotifySongs(query string, page int, filters SearchFilters) ([]Song, int, error) {
-    accessToken, err := GetSpotifyAccessToken()
-    if err != nil {
-        return nil, 0, fmt.Errorf("spotify token error: %v", err)
+    if query == "" {
+        return nil, 0, fmt.Errorf("empty search query")
     }
 
-    sanitizedQuery := calc.SanitizeSearchQuery(query)
-    encodedQuery := url.QueryEscape(sanitizedQuery)
-
-    req, err := http.NewRequest("GET", 
-        fmt.Sprintf("https://api.spotify.com/v1/search?q=%s&type=track&limit=50&offset=%d", 
-        encodedQuery, (page-1)*50), nil)
+    accessToken, err := GetSpotifyAccessToken()
     if err != nil {
-        return nil, 0, err
+        return nil, 0, fmt.Errorf("failed to get access token: %v", err)
+    }
+
+    offset := (page - 1) * ResultsPerPage 
+    baseURL := "https://api.spotify.com/v1/search"
+    params := url.Values{}
+    params.Add("q", query)
+    params.Add("type", "track")
+    params.Add("limit", fmt.Sprintf("%d", ResultsPerPage))
+    params.Add("offset", fmt.Sprintf("%d", offset))
+
+    client := &http.Client{Timeout: 10 * time.Second}
+
+    req, err := http.NewRequest("GET", baseURL+"?"+params.Encode(), nil)
+    if err != nil {
+        return nil, 0, fmt.Errorf("failed to create request: %v", err)
     }
 
     req.Header.Add("Authorization", "Bearer "+accessToken)
-    req.Header.Add("Content-Type", "application/json")
-
-    client := &http.Client{Timeout: 10 * time.Second}
     resp, err := client.Do(req)
     if err != nil {
-        return nil, 0, err
+        return nil, 0, fmt.Errorf("failed to execute request: %v", err)
     }
     defer resp.Body.Close()
 
-    var spotifyResp struct {
+    var searchResp struct {
         Tracks struct {
             Total int `json:"total"`
             Items []struct {
-                ID     string `json:"id"`
-                Name   string `json:"name"`
-                Artists []struct {
+                ID          string    `json:"id"`
+                Name        string    `json:"name"`
+                Duration    int       `json:"duration_ms"`
+                Artists     []struct {
                     Name string `json:"name"`
                 } `json:"artists"`
                 Album struct {
@@ -154,91 +164,103 @@ func SearchSpotifySongs(query string, page int, filters SearchFilters) ([]Song, 
                     } `json:"images"`
                     ReleaseDate string `json:"release_date"`
                 } `json:"album"`
-                Duration int `json:"duration_ms"`
-                PreviewURL string `json:"preview_url"`
             } `json:"items"`
         } `json:"tracks"`
     }
 
-    if err := json.NewDecoder(resp.Body).Decode(&spotifyResp); err != nil {
-        return nil, 0, err
+    if err := json.NewDecoder(resp.Body).Decode(&searchResp); err != nil {
+        return nil, 0, fmt.Errorf("failed to decode response: %v", err)
     }
 
     var songs []Song
-    startDate, _ := time.Parse("2006-01-02", filters.StartDate)
-    endDate, _ := time.Parse("2006-01-02", filters.EndDate)
-
-    for _, track := range spotifyResp.Tracks.Items {
-        var coverURL string
-        var releaseDate time.Time
-
-        if len(track.Album.Images) > 0 {
-            coverURL = track.Album.Images[0].URL
+    for _, item := range searchResp.Tracks.Items {
+        artist := ""
+        if len(item.Artists) > 0 {
+            artist = item.Artists[0].Name
         }
 
-        if track.Album.ReleaseDate != "" {
-            releaseDate = FormatReleaseDate(track.Album.ReleaseDate)
+        coverURL := ""
+        if len(item.Album.Images) > 0 {
+            coverURL = item.Album.Images[0].URL
         }
 
-        if !startDate.IsZero() && releaseDate.Before(startDate) {
-            continue
-        }
-        if !endDate.IsZero() && releaseDate.After(endDate) {
-            continue
-        }
-
-        if filters.MinDuration > 0 && track.Duration < filters.MinDuration*1000 {
-            continue
-        }
-        if filters.MaxDuration > 0 && track.Duration > filters.MaxDuration*1000 {
-            continue
-        }
-
-        songs = append(songs, Song{
-            ID:          track.ID,
-            Title:       track.Name,
-            Artist:      track.Artists[0].Name,
+        song := Song{
+            ID:          item.ID,
+            Title:       item.Name,
+            Artist:      artist,
+            Duration:    item.Duration,
             CoverURL:    coverURL,
-            ReleaseDate: releaseDate,
-            Duration:    track.Duration,
-            PreviewURL:  track.PreviewURL,
-        })
+            ReleaseDate: FormatReleaseDate(item.Album.ReleaseDate),
+        }
+
+        if passesFilters(song, filters) {
+            songs = append(songs, song)
+        }
     }
 
     switch filters.SortBy {
-    case "title":
-        sort.Slice(songs, func(i, j int) bool {
-            if filters.SortOrder == "desc" {
-                return songs[i].Title > songs[j].Title
-            }
-            return songs[i].Title < songs[j].Title
-        })
-    case "artist":
-        sort.Slice(songs, func(i, j int) bool {
-            if filters.SortOrder == "desc" {
-                return songs[i].Artist > songs[j].Artist
-            }
-            return songs[i].Artist < songs[j].Artist
-        })
     case "date":
-        sort.Slice(songs, func(i, j int) bool {
-            if filters.SortOrder == "desc" {
+        if filters.SortOrder == "asc" {
+            sort.Slice(songs, func(i, j int) bool {
+                return songs[i].ReleaseDate.Before(songs[j].ReleaseDate)
+            })
+        } else {
+            sort.Slice(songs, func(i, j int) bool {
                 return songs[i].ReleaseDate.After(songs[j].ReleaseDate)
-            }
-            return songs[i].ReleaseDate.Before(songs[j].ReleaseDate)
-        })
+            })
+        }
+    case "title":
+        if filters.SortOrder == "asc" {
+            sort.Slice(songs, func(i, j int) bool {
+                return songs[i].Title < songs[j].Title
+            })
+        } else {
+            sort.Slice(songs, func(i, j int) bool {
+                return songs[i].Title > songs[j].Title
+            })
+        }
+    case "artist":
+        if filters.SortOrder == "asc" {
+            sort.Slice(songs, func(i, j int) bool {
+                return songs[i].Artist < songs[j].Artist
+            })
+        } else {
+            sort.Slice(songs, func(i, j int) bool {
+                return songs[i].Artist > songs[j].Artist
+            })
+        }
     }
 
-    start := (page - 1) * 10
-    end := start + 10
-    if end > len(songs) {
-        end = len(songs)
-    }
-    if start > len(songs) {
-        return []Song{}, len(songs), nil
+    totalResults := searchResp.Tracks.Total
+    if totalResults > MaxTotalResults {
+        totalResults = MaxTotalResults
     }
 
-    return songs[start:end], len(songs), nil
+    return songs, totalResults, nil
+}
+
+func passesFilters(song Song, filters SearchFilters) bool {
+    if filters.StartDate != "" {
+        startDate, err := time.Parse("2006-01-02", filters.StartDate)
+        if err == nil && song.ReleaseDate.Before(startDate) {
+            return false
+        }
+    }
+    if filters.EndDate != "" {
+        endDate, err := time.Parse("2006-01-02", filters.EndDate)
+        if err == nil && song.ReleaseDate.After(endDate) {
+            return false
+        }
+    }
+
+    if filters.MinDuration > 0 && song.Duration < filters.MinDuration*1000 {
+        return false
+    }
+    if filters.MaxDuration > 0 && song.Duration > filters.MaxDuration*1000 {
+        return false
+    }
+
+    return true
 }
 
 func FetchLyricsOvh(title, artist string) (string, error) {

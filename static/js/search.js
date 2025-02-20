@@ -1,14 +1,14 @@
 function updateDuration(type) {
     const minutes = parseInt(document.getElementById(`${type}DurationMinutes`).value) || 0;
     const seconds = parseInt(document.getElementById(`${type}DurationSeconds`).value) || 0;
-    
+
     if (minutes < 0) minutes = 0;
     if (seconds < 0) seconds = 0;
     if (seconds >= 60) seconds = 59;
-    
+
     const totalSeconds = (minutes * 60) + seconds;
     document.getElementById(`${type}Duration`).value = totalSeconds;
-    
+
     document.getElementById(`${type}DurationMinutes`).value = minutes;
     document.getElementById(`${type}DurationSeconds`).value = seconds;
 }
@@ -32,4 +32,34 @@ document.addEventListener('DOMContentLoaded', function () {
             toast.style.display = 'none';
         }, 3000);
     }
+    function flipCard(card) {
+        card.classList.toggle('flipped');
+    }
+    
+    const songCards = document.querySelectorAll('.song-card');
+    songCards.forEach(card => {
+        let clickCount = 0;
+        let timeout; 
+
+        card.addEventListener('click', function () {
+            clickCount++;
+            if (clickCount === 1) {
+            
+                timeout = setTimeout(function () {
+                
+                    if (!card.classList.contains('flipped')) {
+                        flipCard(card);
+                    }
+                    clickCount = 0; 
+                }, 300); 
+            } else if (clickCount === 2) {
+            
+                clearTimeout(timeout);
+                if (card.classList.contains('flipped')) {
+                    flipCard(card);
+                }
+                clickCount = 0;
+            }
+        });
+    });
 });

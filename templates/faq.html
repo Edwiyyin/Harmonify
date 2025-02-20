@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ - Groupie Tracker</title>
+    <link rel="stylesheet" href="/static/css/faq.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="page-title">Frequently Asked Questions</h1>
+        <div class="faq-list">
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleAnswer(1)">
+                    Q: How did you break down the project?
+                </div>
+                <div class="faq-answer" id="answer1">
+                    A: The project was broken down into several key phases:
+                    <ul>
+                        <li>Choosing the API and testing endpoints with Postman.</li>
+                        <li>Designing wireframes and mockups using Figma.</li>
+                        <li>Implementing and developing the website using Golang, HTML, and CSS.</li>
+                        <li>Testing and debugging the application.</li>
+                        <li>Final delivery of the solution.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleAnswer(2)">
+                    Q: How did you distribute tasks among team members?
+                </div>
+                <div class="faq-answer" id="answer2">
+                    A: Tasks were distributed based on individual strengths and expertise:
+                    <ul>
+                        <li>One team member focused on API integration and backend logic.</li>
+                        <li>Another handled frontend design and user interface development.</li>
+                        <li>A third member was responsible for testing and documentation.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleAnswer(3)">
+                    Q: How did you manage your time during the project?
+                </div>
+                <div class="faq-answer" id="answer3">
+                    A: Time management was crucial. We:
+                    <ul>
+                        <li>Set clear milestones and deadlines for each phase.</li>
+                        <li>Used tools like Trello to track progress.</li>
+                        <li>Prioritized tasks based on their importance and complexity.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleAnswer(4)">
+                    Q: What strategy did you use for documentation?
+                </div>
+                <div class="faq-answer" id="answer4">
+                    A: We followed a structured approach:
+                    <ul>
+                        <li>Created a detailed README file explaining the project setup and usage.</li>
+                        <li>Documented all API endpoints and their functionalities.</li>
+                        <li>Included a project summary and FAQs on the "About" page.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="btn-container">
+            <a href="/" class="btn btn-back">Back to Home</a>
+        </div>
+    </div>
+
+    <script>
+        function toggleAnswer(id) {
+            const answer = document.getElementById(`answer${id}`);
+            answer.classList.toggle('show');
+        }
+    </script>
+</body>
+</html>

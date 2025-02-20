@@ -23,8 +23,10 @@ var (
 	LyricsTemplate        *template.Template
 	PlaylistTemplate      *template.Template
     PlaylistLyricsTemplate *template.Template
-	Playlist              []api.Song
-	PlaylistFile          = "playlist.json"
+    ErrorTemplate          *template.Template
+    FAQTemplate            *template.Template
+    Playlist               []api.Song
+    PlaylistFile           = "playlist.json"
 )
 
 func init() {
@@ -68,16 +70,59 @@ func HandleHome(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func HandleError(w http.ResponseWriter, r *http.Request) {
+    
+    query := r.URL.Query().Get("query")
+    requestedPageStr := r.URL.Query().Get("page")
+    totalPagesStr := r.URL.Query().Get("totalPages")
+
+    requestedPage, err := strconv.Atoi(requestedPageStr)
+    if err != nil || requestedPage < 1 {
+        requestedPage = 1
+    }
+
+    totalPages, err := strconv.Atoi(totalPagesStr)
+    if err != nil || totalPages < 1 {
+        totalPages = 1
+    }
+
+    data := struct {
+        RequestedPage int
+        TotalPages    int
+        Query         string
+    }{
+        RequestedPage: requestedPage,
+        TotalPages:    totalPages,
+        Query:         query,
+    }
+
+    if err := ErrorTemplate.Execute(w, data); err != nil {
+        log.Printf("Failed to render error page: %v", err)
+        http.Error(w, "Failed to render error page", http.StatusInternalServerError)
+    }
+}
+
+func HandleFAQ(w http.ResponseWriter, r *http.Request) {
+    if r.URL.Path != "/faq" {
+        http.NotFound(w, r)
+        return
+    }
+
+    if err := FAQTemplate.Execute(w, nil); err != nil {
+        log.Printf("Error rendering FAQ template: %v", err)
+        http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+    }
+}
+
 func HandleLyrics(w http.ResponseWriter, r *http.Request) {
     songTitle, _ := url.QueryUnescape(r.URL.Query().Get("title"))
     artist := r.URL.Query().Get("artist")
     songID := r.URL.Query().Get("id")
-    query := r.URL.Query().Get("query") // Extract the search query
-    page := r.URL.Query().Get("page")   // Extract the page number
-    pageNum, _ := strconv.Atoi(page)    // Convert page to an integer
+    query := r.URL.Query().Get("query") 
+    page := r.URL.Query().Get("page")   
+    pageNum, _ := strconv.Atoi(page)    
     actionMessage := r.URL.Query().Get("action")
 
-    // If pageNum is 0 (e.g., page parameter is missing or invalid), default to page 1
     if pageNum == 0 {
         pageNum = 1
     }
@@ -120,7 +165,7 @@ func HandleLyrics(w http.ResponseWriter, r *http.Request) {
         InPlaylist:    inPlaylist,
         ActionMessage: actionMessage,
         Query:         query,
-        Page:          pageNum, // Pass the page number
+        Page:          pageNum,
     }
 
     if err := LyricsTemplate.Execute(w, data); err != nil {
@@ -147,19 +192,18 @@ func HandleAddToPlaylist(w http.ResponseWriter, r *http.Request) {
     songId := r.URL.Query().Get("id")
     title := r.URL.Query().Get("title")
     artist := r.URL.Query().Get("artist")
-    query := r.URL.Query().Get("query") // Extract the search query
-    page := r.URL.Query().Get("page")   // Extract the page number
+    query := r.URL.Query().Get("query") 
+    page := r.URL.Query().Get("page")   
 
-    // Check if the song is already in the playlist
+    
     for _, existingSong := range Playlist {
         if strings.EqualFold(existingSong.ID, songId) {
-            // Song already exists in the playlist
+            
             http.Redirect(w, r, fmt.Sprintf("/search?query=%s&page=%s&action=already_exists", query, page), http.StatusSeeOther)
             return
         }
     }
 
-    // Fetch song details from Spotify
     accessToken, err := api.GetSpotifyAccessToken()
     if err != nil {
         http.Error(w, "Failed to get access token", http.StatusInternalServerError)
@@ -202,7 +246,6 @@ func HandleAddToPlaylist(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    // Create the song object
     fullSong := api.Song{
         ID:          songId,
         Title:       title,
@@ -220,11 +263,9 @@ func HandleAddToPlaylist(w http.ResponseWriter, r *http.Request) {
         fullSong.ReleaseDate = api.FormatReleaseDate(trackDetails.Album.ReleaseDate)
     }
 
-    // Add the song to the playlist
     Playlist = append(Playlist, fullSong)
     savePlaylistToFile()
 
-    // Redirect back to the search page with the query and page parameters
     http.Redirect(w, r, fmt.Sprintf("/search?query=%s&page=%s&action=added", query, page), http.StatusSeeOther)
 }
 
@@ -233,17 +274,14 @@ func HandleRemoveFromPlaylist(w http.ResponseWriter, r *http.Request) {
 
     for i, song := range Playlist {
         if song.ID == songId {
-            // Remove the song from the playlist
             Playlist = append(Playlist[:i], Playlist[i+1:]...)
             savePlaylistToFile()
 
-            // Redirect back to the playlist page with a success message
             http.Redirect(w, r, "/playlist?action=removed", http.StatusSeeOther)
             return
         }
     }
 
-    // If the song was not found in the playlist, redirect with an error message
     http.Redirect(w, r, "/playlist?action=not_found", http.StatusSeeOther)
 }
 
@@ -258,17 +296,14 @@ func HandlePlaylistLyrics(w http.ResponseWriter, r *http.Request) {
         pageNum = 1
     }
 
-    // Fetch lyrics for the song
     lyrics, err := api.FetchLyricsOvh(songTitle, artist)
     if err != nil {
         log.Printf("Lyrics fetch error: %v", err)
         lyrics = "Lyrics not available for this song"
     }
 
-    // Generate Spotify URL
     spotifyURL := fmt.Sprintf("https://open.spotify.com/track/%s", songID)
 
-    // Check if the song is in the playlist
     inPlaylist := false
     for _, song := range Playlist {
         if song.ID == songID {
@@ -277,13 +312,12 @@ func HandlePlaylistLyrics(w http.ResponseWriter, r *http.Request) {
         }
     }
 
-    // Prepare data for the template
     data := struct {
         ID            string
         Title         string
         Artist        string
         Lyrics        string
-        SpotifyURL    string // Add Spotify URL
+        SpotifyURL    string
         InPlaylist    bool
         Query         string
         Page          int
@@ -292,13 +326,12 @@ func HandlePlaylistLyrics(w http.ResponseWriter, r *http.Request) {
         Title:         songTitle,
         Artist:        artist,
         Lyrics:        lyrics,
-        SpotifyURL:    spotifyURL, // Pass Spotify URL to the template
+        SpotifyURL:    spotifyURL,
         InPlaylist:    inPlaylist,
         Query:         query,
         Page:          pageNum,
     }
 
-    // Render the playlist-lyrics template
     if err := PlaylistLyricsTemplate.Execute(w, data); err != nil {
         log.Printf("Error rendering playlist-lyrics template: %v", err)
         http.Error(w, "Error rendering playlist-lyrics", http.StatusInternalServerError)
@@ -325,19 +358,10 @@ func HandleGetLyricsText(w http.ResponseWriter, r *http.Request) {
 func HandleSearch(w http.ResponseWriter, r *http.Request) {
     query := r.URL.Query().Get("query")
     page := r.URL.Query().Get("page")
-    pageNum, _ := strconv.Atoi(page)
-    if pageNum == 0 {
+    pageNum, err := strconv.Atoi(page)
+    if err != nil || pageNum < 1 {
         pageNum = 1
     }
-
-    songs, totalResults, err := api.SearchSpotifySongs(query, pageNum, api.SearchFilters{})
-    if err != nil {
-        log.Printf("Search error: %v", err)
-        http.Error(w, "Error searching songs", http.StatusInternalServerError)
-        return
-    }
-
-    totalPages := calc.CalculateTotalPages(totalResults)
 
     filters := api.SearchFilters{
         StartDate:   r.URL.Query().Get("startDate"),
@@ -348,14 +372,30 @@ func HandleSearch(w http.ResponseWriter, r *http.Request) {
         MaxDuration: calc.ParseDuration(r.URL.Query().Get("maxDuration")),
     }
 
-    songs, totalResults, err = api.SearchSpotifySongs(query, pageNum, filters)
+    songs, totalResults, err := api.SearchSpotifySongs(query, pageNum, filters)
     if err != nil {
         log.Printf("Search error: %v", err)
         http.Error(w, "Error searching songs", http.StatusInternalServerError)
         return
     }
 
-    totalPages = (totalResults + 9) / 10 
+    totalPages := totalResults / 8
+    if totalResults%10 > 0 {
+        totalPages++
+    }
+
+    if totalPages < 1 {
+        totalPages = 1
+    }
+
+    log.Printf("Total Results: %d, Total Pages: %d", totalResults, totalPages)
+
+    if pageNum > totalPages {
+        redirectURL := fmt.Sprintf("/error?query=%s&page=%d", query, pageNum)
+        log.Printf("Redirecting to error page: %s", redirectURL)
+        http.Redirect(w, r, redirectURL, http.StatusFound)
+        return
+    }
 
     data := struct {
         Songs        []api.Song

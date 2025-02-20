@@ -37,13 +37,13 @@ body {
     padding: 20px;
     border-radius: 8px;
     line-height: 1.6;
-    overflow-x: auto;
+    overflow-y: auto; 
+    max-height: 400px;
     color: #e0e0e0;
     border: 1px solid #4d4d4d;
     font-family: Arial, sans-serif;
     font-size: 1rem;
 }
-
 .btn-container {
     display: flex;
     justify-content: center;
@@ -76,21 +76,21 @@ body {
 }
 
 .btn-add-playlist {
-    background-color: #f59e0b; /* Orange for "Add to Playlist" */
+    background-color: #f59e0b;
 }
 
 .btn-add-playlist:hover {
-    background-color: #d97706; /* Darker orange on hover */
+    background-color: #d97706;
     transform: translateY(-2px);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .btn-remove-playlist {
-    background-color: #f59e0b; /* Orange for "Remove from Playlist" */
+    background-color: #f59e0b;
 }
 
 .btn-remove-playlist:hover {
-    background-color: #d97706; /* Darker orange on hover */
+    background-color: #d97706;
     transform: translateY(-2px);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
