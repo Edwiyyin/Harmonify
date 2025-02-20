@@ -70,6 +70,10 @@ HARMONIFY/
 │   │   ├── search.css
 │   ├── img/
 │   ├── js/
+│   │   ├── home.js
+│   │   ├── lyrics.js
+│   │   ├── playlist.js
+│   │   ├── search.js
 ├── templates/
 │   ├── home.html
 │   ├── lyrics.html
