@@ -6,6 +6,8 @@ document.addEventListener('DOMContentLoaded', function () {
         showToast('Added to playlist!', 'success');
     } else if (action === 'already_exists') {
         showToast('Song already in playlist!', 'info');
+    } else if (action === 'failed') {
+        showToast('Failed to add to playlist. Please try again.', 'error');
     }
 
     function showToast(message, status) {
