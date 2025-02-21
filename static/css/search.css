@@ -118,14 +118,35 @@ body {
     flex: 1;
 }
 
+.song-actions {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    padding: 10px 0;
+}
+
 .btn-lyrics {
     background-color: #2563eb;
     color: white;
+    padding: 12px 24px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: none;
+    text-align: center;
+    width: 80%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.btn-add-playlist {
-    background-color: #d97706;
-    color: white;
+.btn-lyrics:hover {
+    background-color: #1e40af;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn-lyrics:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .btn-pagination {
@@ -236,43 +257,6 @@ body {
     transform: translateY(-2px);
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
-
-
-#toast {
-    visibility: hidden; 
-    min-width: 250px; 
-    margin-left: -125px; 
-    background-color: #333; 
-    color: #fff; 
-    text-align: center; 
-    border-radius: 5px; 
-    padding: 16px; 
-    position: fixed; 
-    z-index: 1000;
-    left: 50%;
-    bottom: 30px; 
-    font-size: 16px; 
-    opacity: 0; 
-    transition: opacity 0.5s, visibility 0.5s; 
-}
-
-#toast.show {
-    visibility: visible; 
-    opacity: 1; 
-}
-
-#toast.success {
-    background-color: #4CAF50;
-}
-
-#toast.info {
-    background-color: #2196F3;
-}
-
-#toast.error {
-    background-color: #f44336; 
-}
-
 @media (max-width: 768px) {
     .filter-group {
         flex-direction: column;

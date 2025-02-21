@@ -12,7 +12,6 @@ import (
 	"harmonify/src/calc"
 )
 
-
 func init() {
     if err := api.LoadConfig(); err != nil {
         log.Fatalf("Failed to load configuration: %v", err)
