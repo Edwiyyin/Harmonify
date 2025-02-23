@@ -126,7 +126,7 @@ body {
 }
 
 .btn-lyrics {
-    background-color: #2563eb;
+    background-color:  #663399;
     color: white;
     padding: 12px 24px;
     text-decoration: none;
@@ -139,7 +139,7 @@ body {
 }
 
 .btn-lyrics:hover {
-    background-color: #1e40af;
+    background-color: #4B0082;
     transform: translateY(-2px);
     box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
 }
@@ -173,12 +173,12 @@ body {
 }
 
 .btn-remove-playlist {
-    background-color: #f59e0b;
+    background-color: #ef4444;
     color: white;
 }
 
 .btn-remove-playlist:hover {
-    background-color: #d97706;
+    background-color: #dc2626;
     color: white;
     transform: translateY(-2px);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);

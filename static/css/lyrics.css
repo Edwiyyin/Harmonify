@@ -86,11 +86,11 @@ body {
 }
 
 .btn-remove-playlist {
-    background-color: #f59e0b;
+    background-color: #ef4444;
 }
 
 .btn-remove-playlist:hover {
-    background-color: #d97706;
+    background-color: #dc2626;
     transform: translateY(-2px);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }

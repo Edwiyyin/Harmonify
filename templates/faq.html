@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,70 +8,201 @@
 </head>
 <body>
     <div class="container">
-        <h1 class="page-title">Frequently Asked Questions</h1>
+        <h1 class="page-title">Foire Aux Questions</h1>
         <div class="faq-list">
-
             <div class="faq-item">
                 <div class="faq-question" onclick="toggleAnswer(1)">
-                    Q: How did you break down the project?
+                    Q: Comment avez-vous décomposé le projet ?
                 </div>
                 <div class="faq-answer" id="answer1">
-                    A: The project was broken down into several key phases:
+                    A: Le projet a été décomposé en cinq phases principales, suivant les étapes clés recommandées :
                     <ul>
-                        <li>Choosing the API and testing endpoints with Postman.</li>
-                        <li>Designing wireframes and mockups using Figma.</li>
-                        <li>Implementing and developing the website using Golang, HTML, and CSS.</li>
-                        <li>Testing and debugging the application.</li>
-                        <li>Final delivery of the solution.</li>
+                        <li>Phase 1 - Sélection et Test de l'API (1 semaine) :
+                            <ul class="nested-list">
+                                <li>Recherche d'APIs respectant les critères (REST, JSON, sans quota)</li>
+                                <li>Tests des endpoints avec Postman</li>
+                                <li>Documentation des limites et des réponses de l'API</li>
+                                <li>Validation du choix avec l'encadrant</li>
+                            </ul>
+                        </li>
+                        <li>Phase 2 - Design et Maquettage (1 semaine) :
+                            <ul class="nested-list">
+                                <li>Création des wireframes pour toutes les pages requises</li>
+                                <li>Design de l'interface utilisateur selon les contraintes techniques</li>
+                                <li>Validation de l'arborescence du site</li>
+                            </ul>
+                        </li>
+                        <li>Phase 3 - Développement (2 semaines) :
+                            <ul class="nested-list">
+                                <li>Implémentation des fonctionnalités obligatoires (FT1 à FT4)</li>
+                                <li>Développement du système de recherche et filtrage</li>
+                                <li>Création du système de pagination</li>
+                                <li>Mise en place du système de favoris avec persistance</li>
+                            </ul>
+                        </li>
+                        <li>Phase 4 - Tests et Débogage (3 jours) :
+                            <ul class="nested-list">
+                                <li>Tests de toutes les fonctionnalités</li>
+                                <li>Vérification de la gestion des erreurs</li>
+                                <li>Tests de compatibilité navigateur</li>
+                                <li>Correction des bugs identifiés</li>
+                            </ul>
+                        </li>
+                        <li>Phase 5 - Documentation et Finalisation (4 jours) :
+                            <ul class="nested-list">
+                                <li>Rédaction du README</li>
+                                <li>Documentation des routes</li>
+                                <li>Création de la page à propos</li>
+                                <li>Préparation du livrable final</li>
+                            </ul>
+                        </li>
+                        <li>Phase 6 - Résolution des Problèmes et Optimisation (1 semaine) :
+                            <ul class="nested-list">
+                                <li>Correction des bugs majeurs de l'interface utilisateur</li>
+                                <li>Résolution des problèmes de performance avec l'API</li>
+                                <li>Amélioration du système de gestion d'erreurs</li>
+                                <li>Optimisation du cache et des temps de réponse</li>
+                                <li>Correction des problèmes de compatibilité navigateur</li>
+                                <li>Amélioration de la validation des données</li>
+                                <li>Résolution des problèmes de persistance des favoris</li>
+                                <li>Optimisation des requêtes de recherche et filtrage</li>
+                            </ul>
+                        </li>
                     </ul>
                 </div>
             </div>
 
             <div class="faq-item">
                 <div class="faq-question" onclick="toggleAnswer(2)">
-                    Q: How did you distribute tasks among team members?
+                    Q: Comment avez-vous géré votre temps ?
                 </div>
                 <div class="faq-answer" id="answer2">
-                    A: Tasks were distributed based on individual strengths and expertise:
+                    A: La gestion du temps a été structurée selon plusieurs axes :
                     <ul>
-                        <li>One team member focused on API integration and backend logic.</li>
-                        <li>Another handled frontend design and user interface development.</li>
-                        <li>A third member was responsible for testing and documentation.</li>
+                        <li>Planification :
+                            <ul class="nested-list">
+                                <li>Points d'étape hebdomadaires</li>
+                                <li>Réserve de 3 jours pour les imprévus</li>
+                                <li>Définition des priorités en début de semaine</li>
+                                <li>Alternance entre périodes de travail et pauses</li>
+                            </ul>
+                        </li>
+                        <li>Priorisation :
+                            <ul class="nested-list">
+                                <li>Focus initial sur les fonctionnalités obligatoires</li>
+                                <li>Développement par ordre de dépendance technique</li>
+                                <li>Tests en continu pour éviter l'accumulation de bugs</li>
+                                <li>Fonctionnalités bonus uniquement après validation des essentielles</li>
+                            </ul>
+                        </li>
+                        <li>Organisation quotidienne :
+                            <ul class="nested-list">
+                                <li>2 à 4 heures de développement environ chaque journée</li>
+                                <li>Tests et corrections l'après-midi</li>
+                                <li>Documentation en fin de journée</li>
+                                <li>Revue de code quotidienne</li>
+                            </ul>
+                        </li>
+                        <li>Gestion des risques :
+                            <ul class="nested-list">
+                                <li>Identification des points critiques dès le début</li>
+                                <li>Solutions de repli préparées pour les fonctionnalités complexes</li>
+                                <li>Veille sur les limitations de l'API</li>
+                                <li>Suivi régulier de l'avancement</li>
+                            </ul>
+                        </li>
                     </ul>
                 </div>
             </div>
 
             <div class="faq-item">
                 <div class="faq-question" onclick="toggleAnswer(3)">
-                    Q: How did you manage your time during the project?
+                    Q: Quelle stratégie avez-vous adoptée pour la documentation ?
                 </div>
                 <div class="faq-answer" id="answer3">
-                    A: Time management was crucial. We:
+                    A: Notre approche de la documentation s'est faite sur plusieurs niveaux :
                     <ul>
-                        <li>Set clear milestones and deadlines for each phase.</li>
-                        <li>Used tools like Trello to track progress.</li>
-                        <li>Prioritized tasks based on their importance and complexity.</li>
+                        <li>Documentation technique :
+                            <ul class="nested-list">
+                                <li>README détaillé à la racine du projet</li>
+                                <li>Documentation des routes et endpoints</li>
+                                <li>Guide d'installation et de configuration</li>
+                                <li>Description des dépendances et prérequis</li>
+                            </ul>
+                        </li>
+                        <li>Documentation utilisateur :
+                            <ul class="nested-list">
+                                <li>Guide d'utilisation des fonctionnalités</li>
+                                <li>Page à propos complète</li>
+                                <li>FAQ détaillée</li>
+                                <li>Captures d'écran des principales fonctionnalités</li>
+                            </ul>
+                        </li>
+                        <li>Documentation du code :
+                            <ul class="nested-list">
+                                <li>Commentaires pertinents dans le code</li>
+                                <li>Nomenclature cohérente</li>
+                                <li>Structure des dossiers expliquée</li>
+                                <li>Documentation des fonctions principales</li>
+                            </ul>
+                        </li>
+                        <li>Documentation du projet :
+                            <ul class="nested-list">
+                                <li>Suivi des décisions techniques</li>
+                                <li>Journal des difficultés rencontrées</li>
+                                <li>Solutions mises en place</li>
+                                <li>Pistes d'amélioration futures</li>
+                            </ul>
+                        </li>
                     </ul>
                 </div>
             </div>
 
             <div class="faq-item">
                 <div class="faq-question" onclick="toggleAnswer(4)">
-                    Q: What strategy did you use for documentation?
+                    Q: Quels ont été les principaux défis techniques ?
                 </div>
                 <div class="faq-answer" id="answer4">
-                    A: We followed a structured approach:
+                    A: Le projet a présenté plusieurs défis techniques majeurs :
                     <ul>
-                        <li>Created a detailed README file explaining the project setup and usage.</li>
-                        <li>Documented all API endpoints and their functionalities.</li>
-                        <li>Included a project summary and FAQs on the "About" page.</li>
+                        <li>Gestion des contraintes :
+                            <ul class="nested-list">
+                                <li>Utilisation exclusive de Go, HTML,JS et CSS</li>
+                                <li>Pas de frameworks externes</li>
+                                <li>Gestion des erreurs robuste</li>
+                            </ul>
+                        </li>
+                        <li>Implémentation des fonctionnalités :
+                            <ul class="nested-list">
+                                <li>Système de recherche sur multiple critères</li>
+                                <li>Filtres cumulables</li>
+                                <li>Pagination efficace</li>
+                                <li>Persistance des favoris</li>
+                            </ul>
+                        </li>
+                        <li>Performance :
+                            <ul class="nested-list">
+                                <li>Optimisation des requêtes API</li>
+                                <li>Gestion du cache</li>
+                                <li>Temps de réponse optimisés</li>
+                                <li>Charge serveur minimisée</li>
+                            </ul>
+                        </li>
+                        <li>Expérience utilisateur :
+                            <ul class="nested-list">
+                                <li>Interface intuitive</li>
+                                <li>Feedback utilisateur clair</li>
+                                <li>Navigation fluide</li>
+                                <li>Gestion des erreurs user-friendly</li>
+                            </ul>
+                        </li>
                     </ul>
                 </div>
             </div>
         </div>
 
         <div class="btn-container">
-            <a href="/" class="btn btn-back">Back to Home</a>
+            <a href="/" class="btn btn-back">Retour à l'accueil</a>
         </div>
     </div>
 
