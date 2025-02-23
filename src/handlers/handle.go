@@ -202,7 +202,13 @@ func HandleAddToPlaylist(w http.ResponseWriter, r *http.Request) {
 
     for _, existingSong := range Playlist {
         if strings.EqualFold(existingSong.ID, songId) {
-            http.Redirect(w, r, fmt.Sprintf("/search?query=%s&page=%s&action=already_exists", query, page), http.StatusSeeOther)
+            redirectURL := fmt.Sprintf("/lyrics?title=%s&artist=%s&id=%s&query=%s&page=%s&action=already_exists",
+                url.QueryEscape(title),
+                url.QueryEscape(artist),
+                url.QueryEscape(songId),
+                url.QueryEscape(query),
+                url.QueryEscape(page))
+            http.Redirect(w, r, redirectURL, http.StatusSeeOther)
             return
         }
     }
