@@ -160,6 +160,30 @@ body {
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
+.btn-add-playlist {
+    background-color: #f59e0b;
+    color: white;
+}
+
+.btn-add-playlist:hover {
+    background-color: #d97706;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-remove-playlist {
+    background-color: #f59e0b;
+    color: white;
+}
+
+.btn-remove-playlist:hover {
+    background-color: #d97706;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
 .btn-back {
     background-color: #4b5563;
     color: white;
@@ -257,6 +281,32 @@ body {
     transform: translateY(-2px);
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
+
+.toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 12px 24px;
+    border-radius: 6px;
+    color: white;
+    font-weight: 500;
+    z-index: 1000;
+    display: none;
+    animation: slideIn 0.3s ease-out;
+}
+
+.toast.success {
+    background-color: #22c55e;
+}
+
+.toast.error {
+    background-color: #ef4444;
+}
+
+.toast.info {
+    background-color: #3b82f6;
+}
+
 @media (max-width: 768px) {
     .filter-group {
         flex-direction: column;

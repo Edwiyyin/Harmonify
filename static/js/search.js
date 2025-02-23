@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', function () {
             toast.style.display = 'none';
         }, 3000);
     }
+
     function flipCard(card) {
         card.classList.toggle('flipped');
     }
@@ -38,6 +39,61 @@ document.addEventListener('DOMContentLoaded', function () {
 
         card.addEventListener('mouseleave', function () {
             clickCount = 0;
+        });
+    });
+
+    const addRemoveButtons = document.querySelectorAll('.btn-add-playlist, .btn-remove-playlist');
+    addRemoveButtons.forEach(button => {
+        button.addEventListener('click', function (e) {
+            e.preventDefault();
+            const url = new URL(e.target.href);
+            const currentQuery = new URLSearchParams(window.location.search);
+
+            if (currentQuery.has('query')) {
+                url.searchParams.append('query', currentQuery.get('query'));
+            }
+            if (currentQuery.has('page')) {
+                url.searchParams.append('page', currentQuery.get('page'));
+            }
+
+            fetch(url, {
+                redirect: 'follow'
+            })
+            .then(response => {
+                if (response.redirected) {
+                    const redirectUrl = new URL(response.url);
+                    const action = redirectUrl.searchParams.get('action');
+                    
+                    if (action === 'added') {
+                        showToast('Added to playlist!', 'success');
+                        e.target.textContent = 'Remove';
+                        e.target.classList.remove('btn-add-playlist');
+                        e.target.classList.add('btn-remove-playlist');
+                    
+                        const songId = url.searchParams.get('id');
+                        e.target.href = `/remove-from-playlist?id=${songId}`;
+                    } else if (action === 'removed') {
+                        showToast('Removed from playlist!', 'success');
+                    
+                        e.target.textContent = 'Add';
+                        e.target.classList.remove('btn-remove-playlist');
+                        e.target.classList.add('btn-add-playlist');
+                    
+                        const songId = url.searchParams.get('id');
+                        const title = url.searchParams.get('title');
+                        const artist = url.searchParams.get('artist');
+                        e.target.href = `/add-to-playlist?id=${songId}&title=${title}&artist=${artist}`;
+                    } else if (action === 'already_exists') {
+                        showToast('Song is already in playlist!', 'info');
+                    } else if (action === 'failed') {
+                        showToast('Failed to update playlist', 'error');
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Failed to update playlist:', error);
+                showToast('Failed to update playlist', 'error');
+            });
         });
     });
 });

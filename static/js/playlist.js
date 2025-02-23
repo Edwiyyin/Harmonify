@@ -20,4 +20,25 @@ document.addEventListener('DOMContentLoaded', function () {
             toast.style.display = 'none';
         }, 3000);
     }
+
+    function flipCard(card) {
+        card.classList.toggle('flipped');
+    }
+
+    const songCards = document.querySelectorAll('.song-card');
+    songCards.forEach(card => {
+        let clickCount = 0;
+
+        card.addEventListener('click', function () {
+            clickCount++;
+            if (clickCount === 2) {
+                flipCard(card);
+                clickCount = 0;
+            }
+        });
+
+        card.addEventListener('mouseleave', function () {
+            clickCount = 0;
+        });
+    });
 });

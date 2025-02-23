@@ -47,6 +47,7 @@ type Song struct {
 	ReleaseDate time.Time `json:"release_date,omitempty"`
 	PreviewURL string `json:"preview_url,omitempty"`
     Duration    int       `json:"duration"`
+    InPlaylist  bool      `json:"in_playlist"`
 }
 
 type Config struct {

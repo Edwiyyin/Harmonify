@@ -407,6 +407,17 @@ func HandleSearch(w http.ResponseWriter, r *http.Request) {
         return
     }
 
+    for i, song := range songs {
+        inPlaylist := false
+        for _, playlistSong := range Playlist {
+            if playlistSong.ID == song.ID {
+                inPlaylist = true
+                break
+            }
+        }
+        songs[i].InPlaylist = inPlaylist
+    }
+
     totalPages := totalResults / 8
     if totalResults%8 > 0 {
         totalPages++
