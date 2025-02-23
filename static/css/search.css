@@ -14,16 +14,10 @@ body {
     box-shadow: 0 4px 6px rgba(0,0,0,0.3);
 }
 
-.page-title {
-    text-align: center;
-    color: #3b82f6;
-    margin-bottom: 20px;
-}
-
 .results-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(4, 1fr); /* Ensure 4 cards per row */
+    gap: 20px; /* Adjust the gap between cards */
     padding: 20px;
 }
 
@@ -33,8 +27,10 @@ body {
     cursor: pointer;
     border-radius: 8px;
     overflow: hidden;
-    height: 300px;
+    height: 300px; /* Adjust height if needed */
+    width: 100%; /* Ensure cards take up equal width */
 }
+
 
 .flip-card-inner {
     position: relative;
@@ -126,7 +122,7 @@ body {
 }
 
 .btn-lyrics {
-    background-color:  #663399;
+    background-color: #663399;
     color: white;
     padding: 12px 24px;
     text-decoration: none;
@@ -218,27 +214,29 @@ body {
 .filter-group {
     display: flex;
     align-items: flex-end;
-    gap: 20px;
-    margin-bottom: 15px;
-    flex-wrap: wrap; 
+    gap: 30px; /* Augmenter l'espace entre les filtres */
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    justify-content: space-between; /* Éloigner les filtres */
 }
 
 .sort-by-order-group {
     display: flex;
-    gap: 20px; 
-    margin-bottom: 15px; 
+    gap: 30px; /* Augmenter l'espacement */
+    justify-content: space-between; /* Éloigner les boutons */
 }
 
+
 .sort-by-order-group .filter-item {
-    flex: 1; 
-    min-width: 0; 
+    flex: 1;
+    min-width: 0;
 }
 
 .filter-item {
     flex: 1;
-    min-width: 150px;
-    margin-bottom: 10px; 
+    min-width: 180px; 
 }
+
 
 .filter-item label {
     font-weight: bold;
@@ -271,7 +269,7 @@ body {
     border-radius: 4px;
     cursor: pointer;
     transition: all 0.2s ease;
-    font-size: 14px; 
+    font-size: 14px;
     width: 100%;
     margin-top: 10px;
 }
@@ -280,6 +278,51 @@ body {
     background: #1e40af;
     transform: translateY(-2px);
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+
+/* Duration filter styling */
+.duration-inputs.combined-box {
+    display: flex;
+    align-items: center;
+    gap: 2px; /* Very small gap between inputs and colon */
+}
+
+.duration-inputs.combined-box input {
+    width: 60px; /* Larger width for better usability */
+    padding: 6px; /* Slightly smaller padding */
+    font-size: 0.9em; /* Match font size with other inputs */
+    border: 1px solid #4a5568; /* Border color to match other inputs */
+    border-radius: 4px; /* Slightly rounded corners */
+    text-align: center; /* Center text inside inputs */
+    background-color: #374151; /* Match background color */
+    color: #e0e0e0; /* Match text color */
+}
+
+.duration-inputs.combined-box input:focus {
+    border-color: #007bff; /* Highlight border on focus */
+    outline: none; /* Remove default outline */
+}
+
+.duration-inputs.combined-box span {
+    font-size: 0.9em; /* Match font size with inputs */
+    color: #e0e0e0; /* Match text color */
+}
+
+.duration-inputs.combined-box input:hover {
+    border-color: #999; /* Darker border on hover */
+}
+
+/* Page filter styling */
+.page-inputs .page-input {
+    width: 80px; /* Adjust width to match other inputs */
+    padding: 6px; /* Consistent padding */
+    font-size: 0.9em; /* Match font size */
+    border: 1px solid #4a5568; /* Border color to match other inputs */
+    border-radius: 4px; /* Slightly rounded corners */
+    text-align: center; /* Center text inside input */
+    background-color: #374151; /* Match background color */
+    color: #e0e0e0; /* Match text color */
 }
 
 .toast {
@@ -323,5 +366,4 @@ body {
     .apply-filters {
         width: auto;
     }
-
 }

@@ -10,12 +10,10 @@
     <div class="container">
         <div id="toast" class="toast"></div>
         <h1 id="search-results-for-{{.Query}}" class="page-title">Search Results for "{{.Query}}"</h1>
-        
         <div class="filters">
             <form id="filterForm" method="GET" action="/search">
                 <input type="hidden" name="query" value="{{.Query}}">
                 
-            
                 <div class="filter-group">
                     <div class="filter-item">
                         <label for="startDate">From Date:</label>
@@ -27,22 +25,28 @@
                     </div>
                     <div class="filter-item duration-filter">
                         <label for="minDuration">Min Duration:</label>
-                        <div class="duration-inputs">
-                            <input type="number" id="minDurationMinutes" min="0" max="59" placeholder="Min" oninput="updateDuration('min')" value="{{call .DurationMinutes .Filters.MinDuration}}">
+                        <div class="duration-inputs combined-box">
+                            <input type="number" id="minDurationMinutes" min="0" max="59" placeholder="min" 
+                                   oninput="updateDuration('min')" value="{{call .DurationMinutes .Filters.MinDuration}}">
                             <span>:</span>
-                            <input type="number" id="minDurationSeconds" min="0" max="59" placeholder="Sec" oninput="updateDuration('min')" value="{{call .DurationSeconds .Filters.MinDuration}}">
+                            <input type="number" id="minDurationSeconds" min="0" max="59" placeholder="sec" 
+                                   oninput="updateDuration('min')" value="{{call .DurationSeconds .Filters.MinDuration}}">
                             <input type="hidden" id="minDuration" name="minDuration" value="{{.Filters.MinDuration}}">
                         </div>
                     </div>
+                    
                     <div class="filter-item duration-filter">
                         <label for="maxDuration">Max Duration:</label>
-                        <div class="duration-inputs">
-                            <input type="number" id="maxDurationMinutes" min="0" max="59" placeholder="Min" oninput="updateDuration('max')" value="{{call .DurationMinutes .Filters.MaxDuration}}">
+                        <div class="duration-inputs combined-box">
+                            <input type="number" id="maxDurationMinutes" min="0" max="59" placeholder="min" 
+                                oninput="updateDuration('max')" value="{{call .DurationMinutes .Filters.MaxDuration}}">
                             <span>:</span>
-                            <input type="number" id="maxDurationSeconds" min="0" max="59" placeholder="Sec" oninput="updateDuration('max')" value="{{call .DurationSeconds .Filters.MaxDuration}}">
+                            <input type="number" id="maxDurationSeconds" min="0" max="59" placeholder="sec" 
+                                oninput="updateDuration('max')" value="{{call .DurationSeconds .Filters.MaxDuration}}">
                             <input type="hidden" id="maxDuration" name="maxDuration" value="{{.Filters.MaxDuration}}">
                         </div>
                     </div>
+                    
                     <div class="filter-item">
                         <label for="pageNumber">Page ({{.TotalPages}} pages)</label>
                         <div class="page-inputs">
@@ -50,7 +54,12 @@
                         </div>
                     </div>
                 </div>
-            
+
+                <div class="filter-item">
+    <label for="genre">Genre:</label>
+    <input type="text" id="genre" name="genre" value="{{.Filters.Genre}}">
+</div>
+                
                 <div class="sort-by-order-group">
                     <div class="filter-item">
                         <label for="sortBy">Sort By:</label>
@@ -68,9 +77,10 @@
                         </select>
                     </div>
                 </div>
-            
+                
                 <button type="submit" class="apply-filters">Apply Filters</button>
             </form>
+        </div>
             <div class="results-grid">
                 {{ range .Songs }}
                 <div class="song-card" onclick="flipCard(this)">

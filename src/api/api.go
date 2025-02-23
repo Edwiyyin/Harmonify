@@ -194,7 +194,7 @@ func SearchSpotifySongs(query string, page int, filters SearchFilters) ([]Song, 
             ReleaseDate: FormatReleaseDate(item.Album.ReleaseDate),
         }
 
-        if passesFilters(song, filters) {
+        if PassesFilters(song, filters) {
             songs = append(songs, song)
         }
     }
@@ -240,7 +240,7 @@ func SearchSpotifySongs(query string, page int, filters SearchFilters) ([]Song, 
     return songs, totalResults, nil
 }
 
-func passesFilters(song Song, filters SearchFilters) bool {
+func PassesFilters(song Song, filters SearchFilters) bool {
     if filters.StartDate != "" {
         startDate, err := time.Parse("2006-01-02", filters.StartDate)
         if err == nil && song.ReleaseDate.Before(startDate) {
