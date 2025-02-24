@@ -398,6 +398,7 @@ func HandleSearch(w http.ResponseWriter, r *http.Request) {
         SortOrder:   r.URL.Query().Get("sortOrder"),
         MinDuration: calc.ParseDuration(r.URL.Query().Get("minDuration")),
         MaxDuration: calc.ParseDuration(r.URL.Query().Get("maxDuration")),
+        LyricsFilter: r.URL.Query().Get("lyricsFilter"),
     }
 
     songs, totalResults, err := api.SearchSpotifySongs(query, pageNum, filters)

@@ -27,14 +27,13 @@
                         <label for="minDuration">Min Duration:</label>
                         <div class="duration-inputs combined-box">
                             <input type="number" id="minDurationMinutes" min="0" max="59" placeholder="min" 
-                                   oninput="updateDuration('min')" value="{{call .DurationMinutes .Filters.MinDuration}}">
+                                oninput="updateDuration('min')" value="{{call .DurationMinutes .Filters.MinDuration}}">
                             <span>:</span>
                             <input type="number" id="minDurationSeconds" min="0" max="59" placeholder="sec" 
-                                   oninput="updateDuration('min')" value="{{call .DurationSeconds .Filters.MinDuration}}">
+                                oninput="updateDuration('min')" value="{{call .DurationSeconds .Filters.MinDuration}}">
                             <input type="hidden" id="minDuration" name="minDuration" value="{{.Filters.MinDuration}}">
                         </div>
                     </div>
-                    
                     <div class="filter-item duration-filter">
                         <label for="maxDuration">Max Duration:</label>
                         <div class="duration-inputs combined-box">
@@ -46,7 +45,14 @@
                             <input type="hidden" id="maxDuration" name="maxDuration" value="{{.Filters.MaxDuration}}">
                         </div>
                     </div>
-                    
+                    <div class="filter-item">
+                        <label for="lyricsFilter">Lyrics:</label>
+                        <select id="lyricsFilter" name="lyricsFilter">
+                            <option value="" {{if eq .Filters.LyricsFilter ""}}selected{{end}}>All Songs</option>
+                            <option value="with_lyrics" {{if eq .Filters.LyricsFilter "with_lyrics"}}selected{{end}}>With Lyrics</option>
+                            <option value="without_lyrics" {{if eq .Filters.LyricsFilter "without_lyrics"}}selected{{end}}>Without Lyrics</option>
+                        </select>
+                    </div>
                     <div class="filter-item">
                         <label for="pageNumber">Page ({{.TotalPages}} pages)</label>
                         <div class="page-inputs">
@@ -54,7 +60,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="sort-by-order-group">
                     <div class="filter-item">
                         <label for="sortBy">Sort By:</label>

@@ -36,6 +36,7 @@ type SearchFilters struct {
     SortOrder   string `json:"sortOrder"`
     MinDuration int    `json:"minDuration"`
     MaxDuration int    `json:"maxDuration"`
+    LyricsFilter string `json:"lyricsFilter"`
 }
 
 type Song struct {
@@ -192,6 +193,25 @@ func SearchSpotifySongs(query string, page int, filters SearchFilters) ([]Song, 
             Duration:    item.Duration,
             CoverURL:    coverURL,
             ReleaseDate: FormatReleaseDate(item.Album.ReleaseDate),
+        }
+
+        // Check lyrics availability if filter is set
+        if filters.LyricsFilter != "" {
+            hasLyrics := true // Assume lyrics exist by default
+            if _, err := FetchLyricsOvh(song.Title, song.Artist); err != nil {
+                hasLyrics = false
+            }
+
+            switch filters.LyricsFilter {
+                case "with_lyrics":
+                    if !hasLyrics {
+                        continue
+                    }
+                case "without_lyrics":
+                    if hasLyrics {
+                        continue
+                    }
+            }
         }
 
         if PassesFilters(song, filters) {
