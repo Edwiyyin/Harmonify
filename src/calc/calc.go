@@ -27,10 +27,10 @@ func CalculateTotalPages(totalResults int) int {
 }
 
 func ParseDuration(durationStr string) int {
-    if durationStr == "" {
+    duration, err := strconv.Atoi(durationStr)
+    if err != nil {
         return 0
     }
-    duration, _ := strconv.Atoi(durationStr)
     return duration
 }
 
@@ -47,9 +47,9 @@ func UrlencodeTitle(s string) string {
 }
 
 func DurationMinutes(duration int) int {
-    return duration / 60
+    return (duration / 1000) / 60
 }
 
 func DurationSeconds(duration int) int {
-    return duration % 60
+    return (duration / 1000) % 60
 }

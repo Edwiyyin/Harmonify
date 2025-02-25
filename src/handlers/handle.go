@@ -344,10 +344,6 @@ func HandleGetLyricsText(w http.ResponseWriter, r *http.Request) {
 
 func HandleSearch(w http.ResponseWriter, r *http.Request) {
     query := r.URL.Query().Get("query")
-    if query == "" {
-        http.Error(w, "Search query cannot be empty", http.StatusBadRequest)
-        return
-    }
     page := r.URL.Query().Get("page")
     pageNum, err := strconv.Atoi(page)
     if err != nil || pageNum < 1 {

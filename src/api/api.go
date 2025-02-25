@@ -128,6 +128,10 @@ func SearchSpotifySongs(query string, page int, filters SearchFilters) ([]Song, 
             ReleaseDate: FormatReleaseDate(item.Album.ReleaseDate),
         }
 
+        if !PassesFilters(song, filters) {
+            continue
+        }
+
         if filters.LyricsFilter != "" {
             hasLyrics := true 
             if _, err := FetchLyricsOvh(song.Title, song.Artist); err != nil {
@@ -146,9 +150,7 @@ func SearchSpotifySongs(query string, page int, filters SearchFilters) ([]Song, 
             }
         }
 
-        if PassesFilters(song, filters) {
-            songs = append(songs, song)
-        }
+        songs = append(songs, song)
     }
 
     switch filters.SortBy {
@@ -165,21 +167,21 @@ func SearchSpotifySongs(query string, page int, filters SearchFilters) ([]Song, 
     case "title":
         if filters.SortOrder == "asc" {
             sort.Slice(songs, func(i, j int) bool {
-                return songs[i].Title < songs[j].Title
+                return strings.ToLower(songs[i].Title) < strings.ToLower(songs[j].Title)
             })
         } else {
             sort.Slice(songs, func(i, j int) bool {
-                return songs[i].Title > songs[j].Title
+                return strings.ToLower(songs[i].Title) > strings.ToLower(songs[j].Title)
             })
         }
     case "artist":
         if filters.SortOrder == "asc" {
             sort.Slice(songs, func(i, j int) bool {
-                return songs[i].Artist < songs[j].Artist
+                return strings.ToLower(songs[i].Artist) < strings.ToLower(songs[j].Artist)
             })
         } else {
             sort.Slice(songs, func(i, j int) bool {
-                return songs[i].Artist > songs[j].Artist
+                return strings.ToLower(songs[i].Artist) > strings.ToLower(songs[j].Artist)
             })
         }
     }
@@ -270,4 +272,29 @@ func SearchSpotifyMusicSource(title, artist string) (string, error) {
     }
 
     return "", fmt.Errorf("no preview URL found")
+}
+
+func PassesFilters(song Song, filters SearchFilters) bool {
+    if filters.StartDate != "" {
+        startDate, err := time.Parse("2006-01-02", filters.StartDate)
+        if err == nil && song.ReleaseDate.Before(startDate) {
+            return false
+        }
+    }
+    if filters.EndDate != "" {
+        endDate, err := time.Parse("2006-01-02", filters.EndDate)
+        if err == nil && song.ReleaseDate.After(endDate) {
+            return false
+        }
+    }
+
+    if filters.MinDuration > 0 && song.Duration < filters.MinDuration {
+        return false
+    }
+
+    if filters.MaxDuration > 0 && song.Duration > filters.MaxDuration {
+        return false
+    }
+
+    return true
 }

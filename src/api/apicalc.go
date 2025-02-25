@@ -15,44 +15,24 @@ func (s Song) FormattedDuration() string {
 }
 
 func FormatReleaseDate(dateStr string) time.Time {
-	parsedDate, err := time.Parse("2006-01-02", dateStr)
-	if err != nil {
-		return time.Time{}
-	}
-	return parsedDate
+    if dateStr == "" {
+        return time.Time{}
+    }
+    parsedDate, err := time.Parse("2006-01-02", dateStr)
+    if err != nil {
+        return time.Time{}
+    }
+    return parsedDate
 }
 
 func (s Song) FormattedReleaseDate() string {
-	if s.ReleaseDate.IsZero() {
-		return "Unknown"
-	}
-	return s.ReleaseDate.Format("2 January 2006")
+    if s.ReleaseDate.IsZero() {
+        return "Unknown" 
+    }
+    return s.ReleaseDate.Format("2 January 2006")
 }
 
 
-func PassesFilters(song Song, filters SearchFilters) bool {
-    if filters.StartDate != "" {
-        startDate, err := time.Parse("2006-01-02", filters.StartDate)
-        if err == nil && song.ReleaseDate.Before(startDate) {
-            return false
-        }
-    }
-    if filters.EndDate != "" {
-        endDate, err := time.Parse("2006-01-02", filters.EndDate)
-        if err == nil && song.ReleaseDate.After(endDate) {
-            return false
-        }
-    }
-
-    if filters.MinDuration > 0 && song.Duration < filters.MinDuration*1000 {
-        return false
-    }
-    if filters.MaxDuration > 0 && song.Duration > filters.MaxDuration*1000 {
-        return false
-    }
-
-    return true
-}
 
 func LoadConfig() error {
 	configFile, err := os.Open("config.json")
