@@ -6,76 +6,12 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"os"
 	"sort"
 	"strings"
 	"time"
 
 	"harmonify/src/calc"
 )
-
-type SpotifyTokenResponse struct {
-	AccessToken string `json:"access_token"`
-	TokenType   string `json:"token_type"`
-	ExpiresIn   int    `json:"expires_in"`
-}
-
-type SpotifyTrackResponse struct {
-	Tracks struct {
-		Items []struct {
-			PreviewURL string `json:"preview_url"`
-            Duration int `json:"duration_ms"`
-        } `json:"items"`
-    } `json:"tracks"`
-}
-
-type SearchFilters struct {
-    StartDate   string `json:"startDate"`
-    EndDate     string `json:"endDate"`
-    SortBy      string `json:"sortBy"`
-    SortOrder   string `json:"sortOrder"`
-    MinDuration int    `json:"minDuration"`
-    MaxDuration int    `json:"maxDuration"`
-    LyricsFilter string `json:"lyricsFilter"`
-}
-
-type Song struct {
-	ID       string `json:"id"`
-	Title    string `json:"title"`
-	Artist   string `json:"artist"`
-	Lyrics   string `json:"lyrics,omitempty"`
-	CoverURL string `json:"cover_url,omitempty"`
-	ReleaseDate time.Time `json:"release_date,omitempty"`
-	PreviewURL string `json:"preview_url,omitempty"`
-    Duration    int       `json:"duration"`
-    InPlaylist  bool      `json:"in_playlist"`
-}
-
-type Config struct {
-	SpotifyClientID     string `json:"spotify_client_id"`
-	SpotifyClientSecret string `json:"spotify_client_secret"`
-}
-
-var (
-    config             Config
-    spotifyAccessToken string
-    spotifyTokenExpiry time.Time
-)
-
-func LoadConfig() error {
-	configFile, err := os.Open("config.json")
-	if err != nil {
-		return fmt.Errorf("error opening config file: %v", err)
-	}
-	defer configFile.Close()
-
-	decoder := json.NewDecoder(configFile)
-	if err := decoder.Decode(&config); err != nil {
-		return fmt.Errorf("error parsing config file: %v", err)
-	}
-
-	return nil
-}
 
 func GetSpotifyAccessToken() (string, error) {
 	if spotifyAccessToken != "" && time.Now().Before(spotifyTokenExpiry) {
@@ -113,10 +49,7 @@ func GetSpotifyAccessToken() (string, error) {
 
 	return spotifyAccessToken, nil
 }
-const (
-    MaxTotalResults = 1000
-    ResultsPerPage  = 8
-)
+
 
 func SearchSpotifySongs(query string, page int, filters SearchFilters) ([]Song, int, error) {
     if query == "" {
@@ -195,9 +128,8 @@ func SearchSpotifySongs(query string, page int, filters SearchFilters) ([]Song, 
             ReleaseDate: FormatReleaseDate(item.Album.ReleaseDate),
         }
 
-        // Check lyrics availability if filter is set
         if filters.LyricsFilter != "" {
-            hasLyrics := true // Assume lyrics exist by default
+            hasLyrics := true 
             if _, err := FetchLyricsOvh(song.Title, song.Artist); err != nil {
                 hasLyrics = false
             }
@@ -258,30 +190,6 @@ func SearchSpotifySongs(query string, page int, filters SearchFilters) ([]Song, 
     }
 
     return songs, totalResults, nil
-}
-
-func PassesFilters(song Song, filters SearchFilters) bool {
-    if filters.StartDate != "" {
-        startDate, err := time.Parse("2006-01-02", filters.StartDate)
-        if err == nil && song.ReleaseDate.Before(startDate) {
-            return false
-        }
-    }
-    if filters.EndDate != "" {
-        endDate, err := time.Parse("2006-01-02", filters.EndDate)
-        if err == nil && song.ReleaseDate.After(endDate) {
-            return false
-        }
-    }
-
-    if filters.MinDuration > 0 && song.Duration < filters.MinDuration*1000 {
-        return false
-    }
-    if filters.MaxDuration > 0 && song.Duration > filters.MaxDuration*1000 {
-        return false
-    }
-
-    return true
 }
 
 func FetchLyricsOvh(title, artist string) (string, error) {
