@@ -54,5 +54,5 @@ var (
 
 const (
     MaxTotalResults = 1000
-    ResultsPerPage  = 8
+    ResultsPerPage  = 15
 )

@@ -19,8 +19,7 @@ document.addEventListener('DOMContentLoaded', function () {
             e.preventDefault();
             const url = new URL(e.target.href);
             const currentQuery = new URLSearchParams(window.location.search);
-            
-            // Preserve the search query and page number when adding/removing from playlist
+
             if (currentQuery.has('query')) {
                 url.searchParams.append('query', currentQuery.get('query'));
             }
@@ -39,20 +38,16 @@ document.addEventListener('DOMContentLoaded', function () {
                     
                     if (action === 'added') {
                         showToast('Added to playlist!', 'success');
-                        // Update button state
                         e.target.textContent = 'Remove from Playlist';
                         e.target.classList.remove('btn-add-playlist');
                         e.target.classList.add('btn-remove-playlist');
-                        // Update href to point to remove endpoint
                         const songId = url.searchParams.get('id');
                         e.target.href = `/remove-from-playlist?id=${songId}`;
                     } else if (action === 'removed') {
                         showToast('Removed from playlist!', 'success');
-                        // Update button state
                         e.target.textContent = 'Add to Playlist';
                         e.target.classList.remove('btn-remove-playlist');
                         e.target.classList.add('btn-add-playlist');
-                        // Update href to point to add endpoint
                         const songId = url.searchParams.get('id');
                         const title = url.searchParams.get('title');
                         const artist = url.searchParams.get('artist');
@@ -62,8 +57,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     } else if (action === 'failed') {
                         showToast('Failed to update playlist', 'error');
                     }
-                    
-                    // Only update location if we're not on the lyrics page
                     if (!window.location.pathname.includes('/lyrics')) {
                         window.location.href = response.url;
                     }

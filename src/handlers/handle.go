@@ -382,8 +382,8 @@ func HandleSearch(w http.ResponseWriter, r *http.Request) {
         songs[i].InPlaylist = inPlaylist
     }
 
-    totalPages := totalResults / 8
-    if totalResults%8 > 0 {
+    totalPages := totalResults / 15
+    if totalResults%15 > 0 {
         totalPages++
     }
 
