@@ -284,12 +284,12 @@ body {
 .filter-buttons {
     display: flex;
     width: 100%;
-    gap: 10px;
+    gap: 20px;
     margin-top: 20px; 
 }
 
 .apply-filters {
-    flex: 3; 
+    flex: 2.75; 
     background-color: #663399;
     color: white;
     border: none;
@@ -307,7 +307,7 @@ body {
 }
 
 .clear-filters {
-    flex: 1; 
+    flex: 1.25; 
     background-color: #f59e0b;
     color: white;
     border: none;

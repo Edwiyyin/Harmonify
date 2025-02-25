@@ -385,21 +385,13 @@ func HandleSearch(w http.ResponseWriter, r *http.Request) {
             }
         }
         songs = filteredSongs
+        totalResults = len(filteredSongs)
+
     }
 
-    for i, song := range songs {
-        inPlaylist := false
-        for _, playlistSong := range Playlist {
-            if playlistSong.ID == song.ID {
-                inPlaylist = true
-                break
-            }
-        }
-        songs[i].InPlaylist = inPlaylist
-    }
-
-    totalPages := totalResults / 15
-    if totalResults%15 > 0 {
+    resultsPerPage := 15
+    totalPages := totalResults / resultsPerPage
+    if totalResults%resultsPerPage > 0 {
         totalPages++
     }
 
@@ -420,6 +412,7 @@ func HandleSearch(w http.ResponseWriter, r *http.Request) {
         CurrentPage  int
         TotalPages   int
         TotalResults int
+        ResultsPerPage int
         Filters      api.SearchFilters
         DurationMinutes func(int) int
         DurationSeconds func(int) int
@@ -429,6 +422,7 @@ func HandleSearch(w http.ResponseWriter, r *http.Request) {
         CurrentPage:  pageNum,
         TotalPages:   totalPages,
         TotalResults: totalResults,
+        ResultsPerPage: resultsPerPage,
         Filters:      filters,
         DurationMinutes: calc.DurationMinutes,
         DurationSeconds: calc.DurationSeconds,
