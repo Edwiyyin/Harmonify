@@ -14,6 +14,13 @@ body {
     box-shadow: 0 4px 6px rgba(0,0,0,0.3);
 }
 
+.page-title {
+    color: #2563eb;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+
 .results-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -283,7 +290,7 @@ body {
 
 .apply-filters {
     flex: 3; 
-    background-color: #2563eb;
+    background-color: #663399;
     color: white;
     border: none;
     padding: 10px 20px;
@@ -294,14 +301,14 @@ body {
 }
 
 .apply-filters:hover {
-    background: #1e40af;
+    background: #4B0082;
     transform: translateY(-2px);
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
 .clear-filters {
     flex: 1; 
-    background-color: #663399;
+    background-color: #f59e0b;
     color: white;
     border: none;
     padding: 10px 20px;
@@ -312,7 +319,7 @@ body {
 }
 
 .clear-filters:hover {
-    background-color: #4B0082;
+    background-color: #d97706;
     transform: translateY(-2px);
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
