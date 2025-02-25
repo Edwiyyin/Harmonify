@@ -273,21 +273,45 @@ body {
     margin: 0;
 }
 
-.apply-filters {
-    background: #2563eb;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: 14px;
+.filter-buttons {
+    display: flex;
     width: 100%;
-    margin-top: 10px;
+    gap: 10px;
+    margin-top: 20px; 
+}
+
+.apply-filters {
+    flex: 3; 
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
 }
 
 .apply-filters:hover {
     background: #1e40af;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.clear-filters {
+    flex: 1; 
+    background-color: #663399;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;;
+}
+
+.clear-filters:hover {
+    background-color: #4B0082;
     transform: translateY(-2px);
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }

@@ -87,7 +87,10 @@
                     </div>
                 </div>
                 
-                <button type="submit" class="apply-filters">Apply Filters</button>
+                <div class="filter-buttons">
+                    <button type="submit" class="apply-filters">Apply Filters</button>
+                    <button type="button" id="clearFilters" class="clear-filters">Clear Filters</button>
+                </div>
             </form>
         </div>
         {{ if .Songs }}
