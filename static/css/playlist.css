@@ -22,7 +22,7 @@ body {
 
 .results-grid {
     display: grid;
-    grid-template-columns: repeat(5, 1fr); 
+    grid-template-columns: repeat(5, 1fr);
     gap: 20px;
     padding: 20px;
 }
@@ -34,6 +34,7 @@ body {
     border-radius: 8px;
     overflow: hidden;
     height: 300px;
+    width: 100%;
 }
 
 .flip-card-inner {
@@ -117,12 +118,14 @@ body {
     border-radius: 5px;
     text-align: center;
     white-space: nowrap;
-    min-width: 80px;
+    width: 80%;
 }
 
 .btn-back {
     background-color: #6b7280;
     color: white;
+    width: 10%;
+    margin-left: 20px;
 }
 
 .btn-lyrics {

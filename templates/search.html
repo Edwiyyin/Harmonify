@@ -54,14 +54,29 @@
                         </select>
                     </div>
                     <div class="filter-item">
+                        <label for="playlistFilter">Playlist Status:</label>
+                        <select id="playlistFilter" name="playlistFilter">
+                            <option value="all" {{if eq .Filters.PlaylistFilter "all"}}selected{{end}}>All Songs</option>
+                            <option value="in_playlist" {{if eq .Filters.PlaylistFilter "in_playlist"}}selected{{end}}>In Playlist</option>
+                            <option value="not_in_playlist" {{if eq .Filters.PlaylistFilter "not_in_playlist"}}selected{{end}}>Not In Playlist</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="sort-by-order-group">
+                    <div class="filter-item">
+                        <label for="sortOrder">Order:</label>
+                        <select id="sortOrder" name="sortOrder">
+                            <option value="asc" {{if eq .Filters.SortOrder "asc"}}selected{{end}}>Ascending</option>
+                            <option value="desc" {{if eq .Filters.SortOrder "desc"}}selected{{end}}>Descending</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
                         <label for="pageNumber">Page (66 pages)</label>
                         <div class="page-inputs">
                             <input type="number" id="pageNumber" name="page" min="1" max="66" value="{{.CurrentPage}}" class="page-input">
                         </div>
                     </div>
-                </div>
-
-                <div class="sort-by-order-group">
                     <div class="filter-item">
                         <label for="sortBy">Sort By:</label>
                         <select id="sortBy" name="sortBy">
@@ -70,18 +85,12 @@
                             <option value="artist" {{if eq .Filters.SortBy "artist"}}selected{{end}}>Artist</option>
                         </select>
                     </div>
-                    <div class="filter-item">
-                        <label for="sortOrder">Order:</label>
-                        <select id="sortOrder" name="sortOrder">
-                            <option value="asc" {{if eq .Filters.SortOrder "asc"}}selected{{end}}>Ascending</option>
-                            <option value="desc" {{if eq .Filters.SortOrder "desc"}}selected{{end}}>Descending</option>
-                        </select>
-                    </div>
                 </div>
                 
                 <button type="submit" class="apply-filters">Apply Filters</button>
             </form>
         </div>
+        {{ if .Songs }}
         <div class="results-grid">
             {{ range .Songs }}
             <div class="song-card" onclick="flipCard(this)">
@@ -116,16 +125,21 @@
             </div>
             {{ end }}
         </div>
+        {{ else }}
+        <div class="no-results">
+            <p>No results found for your search criteria.</p>
+        </div>
+        {{ end }}
         <div class="pagination">
             {{if gt .CurrentPage 1}}
-                <a href="/search?query={{.Query}}&page={{minus .CurrentPage 1}}&startDate={{.Filters.StartDate}}&endDate={{.Filters.EndDate}}&sortBy={{.Filters.SortBy}}&sortOrder={{.Filters.SortOrder}}&minDuration={{.Filters.MinDuration}}&maxDuration={{.Filters.MaxDuration}}&lyricsFilter={{.Filters.LyricsFilter}}" class="btn btn-pagination">Previous</a>
+            <a href="/search?query={{.Query}}&page={{minus .CurrentPage 1}}&startDate={{.Filters.StartDate}}&endDate={{.Filters.EndDate}}&sortBy={{.Filters.SortBy}}&sortOrder={{.Filters.SortOrder}}&minDuration={{.Filters.MinDuration}}&maxDuration={{.Filters.MaxDuration}}&lyricsFilter={{.Filters.LyricsFilter}}&playlistFilter={{.Filters.PlaylistFilter}}" class="btn btn-pagination">Previous</a>
             {{end}}
             <a href="/" class="btn btn-back">Go Home</a>
             {{if lt .CurrentPage .TotalPages}}
-                <a href="/search?query={{.Query}}&page={{plus .CurrentPage 1}}&startDate={{.Filters.StartDate}}&endDate={{.Filters.EndDate}}&sortBy={{.Filters.SortBy}}&sortOrder={{.Filters.SortOrder}}&minDuration={{.Filters.MinDuration}}&maxDuration={{.Filters.MaxDuration}}&lyricsFilter={{.Filters.LyricsFilter}}" class="btn btn-pagination">Next</a>
+                <a href="/search?query={{.Query}}&page={{plus .CurrentPage 1}}&startDate={{.Filters.StartDate}}&endDate={{.Filters.EndDate}}&sortBy={{.Filters.SortBy}}&sortOrder={{.Filters.SortOrder}}&minDuration={{.Filters.MinDuration}}&maxDuration={{.Filters.MaxDuration}}&lyricsFilter={{.Filters.LyricsFilter}}&playlistFilter={{.Filters.PlaylistFilter}}" class="btn btn-pagination">Next</a>
             {{end}}
             {{if eq .TotalPages 0}}
-                <a href="/search?query={{.Query}}&page=1&startDate={{.Filters.StartDate}}&endDate={{.Filters.EndDate}}&sortBy={{.Filters.SortBy}}&sortOrder={{.Filters.SortOrder}}&minDuration={{.Filters.MinDuration}}&maxDuration={{.Filters.MaxDuration}}&lyricsFilter={{.Filters.LyricsFilter}}" class="btn btn-pagination">Next</a>
+                <a href="/search?query={{.Query}}&page=1&&startDate={{.Filters.StartDate}}&endDate={{.Filters.EndDate}}&sortBy={{.Filters.SortBy}}&sortOrder={{.Filters.SortOrder}}&minDuration={{.Filters.MinDuration}}&maxDuration={{.Filters.MaxDuration}}&lyricsFilter={{.Filters.LyricsFilter}}&playlistFilter={{.Filters.PlaylistFilter}}" class="btn btn-pagination">Next</a>
             {{end}}
         </div>
         <div class="page-info">

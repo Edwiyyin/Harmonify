@@ -27,6 +27,7 @@ type SearchFilters struct {
     MinDuration int    `json:"minDuration"`
     MaxDuration int    `json:"maxDuration"`
     LyricsFilter string `json:"lyricsFilter"`
+    PlaylistFilter string `json:"playlistFilter"`
 }
 
 type Song struct {

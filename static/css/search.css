@@ -21,6 +21,18 @@ body {
     padding: 20px;
 }
 
+.no-results {
+    text-align: center;
+    padding: 40px; 
+    font-size: 2em; 
+    color: #e0e0e0;
+    background-color: #3d3d3d;
+    border-radius: 8px;
+    margin-top: 20px;
+    font-weight: bold;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
 .song-card {
     background-color: transparent;
     perspective: 1000px;

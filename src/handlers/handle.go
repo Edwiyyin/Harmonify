@@ -245,7 +245,7 @@ func HandleAddToPlaylist(w http.ResponseWriter, r *http.Request) {
         fullSong.ReleaseDate = api.FormatReleaseDate(trackDetails.Album.ReleaseDate)
     }
     Playlist = append(Playlist, fullSong)
-    if err := savePlaylistToFile(); err != nil {
+    if err := SavePlaylistToFile(); err != nil {
         log.Printf("Failed to save playlist: %v", err)
         http.Redirect(w, r, fmt.Sprintf("/search?query=%s&page=%s&action=failed", query, page), http.StatusSeeOther)
         return
@@ -259,7 +259,7 @@ func HandleRemoveFromPlaylist(w http.ResponseWriter, r *http.Request) {
     for i, song := range Playlist {
         if song.ID == songId {
             Playlist = append(Playlist[:i], Playlist[i+1:]...)
-            if err := savePlaylistToFile(); err != nil {
+            if err := SavePlaylistToFile(); err != nil {
                 log.Printf("Failed to save playlist: %v", err)
                 http.Redirect(w, r, "/playlist?action=failed", http.StatusSeeOther)
                 return
@@ -362,6 +362,7 @@ func HandleSearch(w http.ResponseWriter, r *http.Request) {
         MinDuration: calc.ParseDuration(r.URL.Query().Get("minDuration")),
         MaxDuration: calc.ParseDuration(r.URL.Query().Get("maxDuration")),
         LyricsFilter: r.URL.Query().Get("lyricsFilter"),
+        PlaylistFilter: r.URL.Query().Get("playlistFilter"),
     }
 
     songs, totalResults, err := api.SearchSpotifySongs(query, pageNum, filters)
@@ -369,6 +370,25 @@ func HandleSearch(w http.ResponseWriter, r *http.Request) {
         log.Printf("Search error: %v", err)
         http.Error(w, "Error searching songs", http.StatusInternalServerError)
         return
+    }
+
+    if filters.PlaylistFilter == "in_playlist" || filters.PlaylistFilter == "not_in_playlist" {
+        var filteredSongs []api.Song
+        for _, song := range songs {
+            inPlaylist := false
+            for _, playlistSong := range Playlist {
+                if playlistSong.ID == song.ID {
+                    inPlaylist = true
+                    break
+                }
+            }
+            
+            if (filters.PlaylistFilter == "in_playlist" && inPlaylist) || 
+               (filters.PlaylistFilter == "not_in_playlist" && !inPlaylist) {
+                filteredSongs = append(filteredSongs, song)
+            }
+        }
+        songs = filteredSongs
     }
 
     for i, song := range songs {

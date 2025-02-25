@@ -9,10 +9,10 @@ import (
 )
 
 func init() {
-	loadPlaylistFromFile()
+	LoadPlaylistFromFile()
 }
 
-func loadPlaylistFromFile() {
+func LoadPlaylistFromFile() {
 	data, err := ioutil.ReadFile(PlaylistFile)
 	if err != nil {
 		if !os.IsNotExist(err) {
@@ -26,7 +26,7 @@ func loadPlaylistFromFile() {
 	}
 }
 
-func savePlaylistToFile() error {
+func SavePlaylistToFile() error {
     data, err := json.MarshalIndent(Playlist, "", "  ")
     if err != nil {
         log.Printf("Error marshaling playlist: %v", err)
