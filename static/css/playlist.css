@@ -152,11 +152,14 @@ body {
 
 .no-playlist-items {
     text-align: center;
-    color: #9ca3af;
-    margin-top: 20px;
-    padding: 40px;
-    background-color: #2d2d2d;
+    padding: 40px; 
+    font-size: 2em; 
+    color: #e0e0e0;
+    background-color: #3d3d3d;
     border-radius: 8px;
+    margin-top: 20px;
+    font-weight: bold;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
 
 .toast {
