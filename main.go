@@ -9,7 +9,6 @@ import (
 
 	"harmonify/src/handlers"
 	"harmonify/src/api"
-	"harmonify/src/calc"
 )
 
 func init() {
@@ -18,11 +17,11 @@ func init() {
     }
 
     funcMap := template.FuncMap{
-        "minus":           calc.Minus,
-        "plus":            calc.Plus,
-        "urlencodeTitle":  calc.UrlencodeTitle,
-        "durationMinutes": calc.DurationMinutes,
-        "durationSeconds": calc.DurationSeconds,
+        "minus":           api.Minus,
+        "plus":            api.Plus,
+        "urlencodeTitle":  api.UrlencodeTitle,
+        "durationMinutes": api.DurationMinutes,
+        "durationSeconds": api.DurationSeconds,
     }
 
     var err error

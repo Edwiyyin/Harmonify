@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"harmonify/src/api"
-	"harmonify/src/calc"
 )
 
 var (
@@ -355,8 +354,8 @@ func HandleSearch(w http.ResponseWriter, r *http.Request) {
         EndDate:     r.URL.Query().Get("endDate"),
         SortBy:      r.URL.Query().Get("sortBy"),
         SortOrder:   r.URL.Query().Get("sortOrder"),
-        MinDuration: calc.ParseDuration(r.URL.Query().Get("minDuration")),
-        MaxDuration: calc.ParseDuration(r.URL.Query().Get("maxDuration")),
+        MinDuration: api.ParseDuration(r.URL.Query().Get("minDuration")),
+        MaxDuration: api.ParseDuration(r.URL.Query().Get("maxDuration")),
         LyricsFilter: r.URL.Query().Get("lyricsFilter"),
         PlaylistFilter: r.URL.Query().Get("playlistFilter"),
     }
@@ -424,8 +423,8 @@ func HandleSearch(w http.ResponseWriter, r *http.Request) {
         TotalResults: totalResults,
         ResultsPerPage: resultsPerPage,
         Filters:      filters,
-        DurationMinutes: calc.DurationMinutes,
-        DurationSeconds: calc.DurationSeconds,
+        DurationMinutes: api.DurationMinutes,
+        DurationSeconds: api.DurationSeconds,
     }
 
     if err := SearchResultsTemplate.Execute(w, data); err != nil {

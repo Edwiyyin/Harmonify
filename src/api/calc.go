@@ -3,9 +3,61 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"net/url"
 	"os"
+	"regexp"
+	"strconv"
+	"strings"
 	"time"
 )
+
+func SanitizeSearchQuery(query string) string {
+
+    re := regexp.MustCompile(`\s*\([^)]*\)`)
+    query = re.ReplaceAllString(query, "")
+
+    parts := strings.Split(query, "-")
+    query = strings.TrimSpace(parts[0])
+
+    return strings.TrimSpace(query)
+}
+
+func CalculateTotalPages(totalResults int) int {
+    if totalResults <= 0 {
+        return 1
+    }
+    const resultsPerPage = 8
+    return (totalResults + resultsPerPage - 1) / resultsPerPage
+}
+
+func ParseDuration(durationStr string) int {
+    duration, err := strconv.Atoi(durationStr)
+    if err != nil {
+        return 0
+    }
+    return duration
+}
+
+func Minus(a, b int) int {
+    return a - b
+}
+
+func Plus(a, b int) int {
+    return a + b
+}
+
+func UrlencodeTitle(s string) string {
+    return url.QueryEscape(s)
+}
+
+func DurationMinutes(duration int) int {
+    return (duration / 1000) / 60
+}
+
+func DurationSeconds(duration int) int {
+    return (duration / 1000) % 60
+}
+
 
 func (s Song) FormattedDuration() string {
     seconds := s.Duration / 1000
@@ -31,8 +83,6 @@ func (s Song) FormattedReleaseDate() string {
     }
     return s.ReleaseDate.Format("2 January 2006")
 }
-
-
 
 func LoadConfig() error {
 	configFile, err := os.Open("config.json")

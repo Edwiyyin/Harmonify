@@ -10,7 +10,6 @@ import (
 	"strings"
 	"time"
 
-	"harmonify/src/calc"
 )
 
 func GetSpotifyAccessToken() (string, error) {
@@ -195,7 +194,7 @@ func SearchSpotifySongs(query string, page int, filters SearchFilters) ([]Song, 
 }
 
 func FetchLyricsOvh(title, artist string) (string, error) {
-    sanitizedTitle := calc.SanitizeSearchQuery(title)
+    sanitizedTitle := SanitizeSearchQuery(title)
     
     encodedTitle := url.QueryEscape(sanitizedTitle)
     encodedArtist := url.QueryEscape(artist)
@@ -238,7 +237,7 @@ func SearchSpotifyMusicSource(title, artist string) (string, error) {
         return "", fmt.Errorf("spotify token error: %v", err)
     }
 
-    sanitizedTitle := calc.SanitizeSearchQuery(title)
+    sanitizedTitle := SanitizeSearchQuery(title)
     firstArtist := strings.Split(artist, ",")[0]
     firstArtist = strings.TrimSpace(firstArtist)
 
