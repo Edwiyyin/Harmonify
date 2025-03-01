@@ -49,6 +49,8 @@ go run main.go
 - `/lyrics`: Show song lyrics and additional details
 - `/playlist`: Manage playlist songs
 - `/playlist-lyrics`: Same as /lyrics but for /playlist
+- `/register`: To create an account
+- `/login`: To log into your account
 - `/error`: Indicate error in /search
 - `/faq`: For FAQ
 
@@ -59,7 +61,13 @@ Harmonify/
     ├── README.md
     ├── go.mod
     ├── main.go
-    ├── playlist.json
+    ├── data/
+    │   ├──playlists/
+    │   │    ├──<username>_playlist.json
+    │   │    └──default.json
+    │   │   
+    │   ├──configure.json
+    │   └──users.json
     ├── src/
     │   ├── api/
     │   │   ├── api.go
@@ -73,6 +81,7 @@ Harmonify/
     ├── static/
     │   ├── css/
     │   │   ├── faq.css
+    │   │   ├── form.css
     │   │   ├── home.css
     │   │   ├── lyrics.css
     │   │   ├── playlist.css
@@ -87,9 +96,11 @@ Harmonify/
         ├── error.html
         ├── faq.html
         ├── home.html
+        ├──login.html
         ├── lyrics.html
         ├── playlist-lyrics.html
         ├── playlist.html
+        ├── register.html
         └── search.html
 
 
