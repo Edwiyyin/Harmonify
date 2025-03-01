@@ -20,14 +20,15 @@
                     class="search-input" 
                     placeholder="Search for songs, artists..." 
                     required>
-                <button type="submit" class="search-btn">Search</button>
+                <div class="action-buttons">
+                    <button type="submit" class="search-btn">Search</button>
+                    <a href="/playlist" class="playlist-btn">View Playlists</a>
+                </div>
             </form>
         </div>
 
         <div class="button-container">
-            <form action="/playlist" method="GET" class="search-form">
-                <button type="submit" class="favorites-btn">View Playlists</button>
-            </form>
+            <a href="/static/docs/Documentation.pdf" download class="doc-btn">Download Documentation</a>
             <a href="/faq" class="faq-btn">FAQ</a>
         </div>
     </div>
