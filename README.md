@@ -28,7 +28,7 @@ Harmonify is a web application that allows users to search for song lyrics, disc
 ## Setup
 
 1. Clone the repository
-2. Create `config.json` with API credentials:
+2. Create `data/config.json` with API credentials:
 ```json
 {
     "spotify_client_id": "YOUR_SPOTIFY_CLIENT_ID",

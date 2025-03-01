@@ -510,14 +510,12 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	
-	// Method not allowed
 	http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 }
 
-// HandleRegister processes registration requests
 func HandleRegister(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
-		// Display registration form
+
 		if err := RegisterTemplate.Execute(w, nil); err != nil {
 			log.Printf("Error rendering register template: %v", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -526,7 +524,7 @@ func HandleRegister(w http.ResponseWriter, r *http.Request) {
 	}
 	
 	if r.Method == http.MethodPost {
-		// Process registration form
+
 		if err := r.ParseForm(); err != nil {
 			http.Error(w, "Error parsing form", http.StatusBadRequest)
 			return
@@ -535,8 +533,7 @@ func HandleRegister(w http.ResponseWriter, r *http.Request) {
 		username := r.FormValue("username")
 		password := r.FormValue("password")
 		confirmPassword := r.FormValue("confirm_password")
-		
-		// Validate input
+
 		if username == "" || password == "" {
 			data := struct {
 				Error string
@@ -564,8 +561,7 @@ func HandleRegister(w http.ResponseWriter, r *http.Request) {
 			}
 			return
 		}
-		
-		// Register user
+
 		if err := auth.RegisterUser(username, password); err != nil {
 			data := struct {
 				Error string
@@ -579,30 +575,23 @@ func HandleRegister(w http.ResponseWriter, r *http.Request) {
 			}
 			return
 		}
-		
-		// Redirect to login page
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
 		return
 	}
-	
-	// Method not allowed
 	http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 }
 
 func HandleLogout(w http.ResponseWriter, r *http.Request) {
-    // Get current user and session
     sessionID, username, loggedIn := getSessionInfo(r)
     
     if loggedIn {
-        // Save user's playlist
+
         if err := auth.SaveUserPlaylist(username, Playlist); err != nil {
             log.Printf("Error saving user playlist: %v", err)
         }
         
-        // Clear session
         delete(activeSessions, sessionID)
-        
-        // Clear session cookie
+    
         cookie := http.Cookie{
             Name:     "session_id",
             Value:    "",
@@ -613,24 +602,17 @@ func HandleLogout(w http.ResponseWriter, r *http.Request) {
         http.SetCookie(w, &cookie)
     }
     
-    // Reset global playlist
     Playlist = []api.Song{}
     
-    // Redirect to home page
     http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
-// generateSessionID creates a unique session ID
-
-
-// AuthMiddleware checks if a user is logged in
 func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// Get session info
+
 		_, _, loggedIn := getSessionInfo(r)
 		
 		if !loggedIn {
-			// Redirect to login page
 			http.Redirect(w, r, "/login", http.StatusSeeOther)
 			return
 		}
