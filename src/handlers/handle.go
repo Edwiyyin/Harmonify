@@ -3,7 +3,6 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"html/template"
 	"log"
 	"net/http"
 	"net/url"
@@ -12,29 +11,35 @@ import (
 	"time"
 
 	"harmonify/src/api"
-)
-
-var (
-	HomeTemplate          *template.Template
-	SearchResultsTemplate *template.Template
-	LyricsTemplate        *template.Template
-	PlaylistTemplate      *template.Template
-    PlaylistLyricsTemplate *template.Template
-    ErrorTemplate          *template.Template
-    FAQTemplate            *template.Template
-    Playlist               []api.Song
-    PlaylistFile           = "playlist.json"
+	"harmonify/src/auth"
 )
 
 func HandleHome(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/" {
-		http.NotFound(w, r)
-		return
-	}
-	if err := HomeTemplate.Execute(w, nil); err != nil {
-		log.Printf("Error rendering home template: %v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-	}
+    if r.URL.Path != "/" {
+        http.NotFound(w, r)
+        return
+    }
+
+    playlist, err := LoadPlaylistFromFile()
+    if err != nil {
+        log.Printf("Error loading playlist: %v", err)
+        http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+        return
+    }
+
+    Playlist = playlist
+    _, _, loggedIn := getSessionInfo(r)
+
+    data := struct {
+        LoggedIn bool
+    }{
+        LoggedIn: loggedIn,
+    }
+
+    if err := HomeTemplate.Execute(w, data); err != nil {
+        log.Printf("Error rendering home template: %v", err)
+        http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+    }
 }
 
 func HandleError(w http.ResponseWriter, r *http.Request) {
@@ -143,16 +148,23 @@ func HandleLyrics(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandlePlaylist(w http.ResponseWriter, r *http.Request) {
-	data := struct {
-		Playlist []api.Song
-	}{
-		Playlist: Playlist,
-	}
+    playlist, err := LoadPlaylistFromFile()
+    if err != nil {
+        log.Printf("Error loading playlist: %v", err)
+        http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+        return
+    }
 
-	if err := PlaylistTemplate.Execute(w, data); err != nil {
-		log.Printf("Error rendering playlist template: %v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-	}
+    data := struct {
+        Playlist []api.Song
+    }{
+        Playlist: playlist,
+    }
+
+    if err := PlaylistTemplate.Execute(w, data); err != nil {
+        log.Printf("Error rendering playlist template: %v", err)
+        http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+    }
 }
 
 func HandleAddToPlaylist(w http.ResponseWriter, r *http.Request) {
@@ -271,6 +283,7 @@ func HandleRemoveFromPlaylist(w http.ResponseWriter, r *http.Request) {
 
     http.Redirect(w, r, "/playlist?action=not_found", http.StatusSeeOther)
 }
+
 func HandlePlaylistLyrics(w http.ResponseWriter, r *http.Request) {
     songTitle, _ := url.QueryUnescape(r.URL.Query().Get("title"))
     artist := r.URL.Query().Get("artist")
@@ -432,4 +445,195 @@ func HandleSearch(w http.ResponseWriter, r *http.Request) {
         http.Error(w, "Error rendering results", http.StatusInternalServerError)
         return
     }
+}
+
+
+func HandleLogin(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+
+		if err := LoginTemplate.Execute(w, nil); err != nil {
+			log.Printf("Error rendering login template: %v", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		}
+		return
+	}
+	
+	if r.Method == http.MethodPost {
+
+		if err := r.ParseForm(); err != nil {
+			http.Error(w, "Error parsing form", http.StatusBadRequest)
+			return
+		}
+		
+		username := r.FormValue("username")
+		password := r.FormValue("password")
+
+		if auth.AuthenticateUser(username, password) {
+
+			sessionID := generateSessionID()
+
+			activeSessions[sessionID] = Session{
+				Username:  username,
+				LoggedIn:  true,
+				CreatedAt: time.Now(),
+			}
+			cookie := http.Cookie{
+				Name:     "session_id",
+				Value:    sessionID,
+				Path:     "/",
+				MaxAge:   3600 * 24,
+				HttpOnly: true,
+			}
+			http.SetCookie(w, &cookie)
+		
+			playlist, err := auth.LoadUserPlaylist(username)
+			if err != nil {
+				log.Printf("Error loading user playlist: %v", err)
+			}
+
+			Playlist = playlist
+
+			http.Redirect(w, r, "/", http.StatusSeeOther)
+			return
+		}
+
+		data := struct {
+			Error string
+		}{
+			Error: "Invalid username or password",
+		}
+		
+		if err := LoginTemplate.Execute(w, data); err != nil {
+			log.Printf("Error rendering login template: %v", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		}
+		return
+	}
+	
+	// Method not allowed
+	http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+}
+
+// HandleRegister processes registration requests
+func HandleRegister(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		// Display registration form
+		if err := RegisterTemplate.Execute(w, nil); err != nil {
+			log.Printf("Error rendering register template: %v", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		}
+		return
+	}
+	
+	if r.Method == http.MethodPost {
+		// Process registration form
+		if err := r.ParseForm(); err != nil {
+			http.Error(w, "Error parsing form", http.StatusBadRequest)
+			return
+		}
+		
+		username := r.FormValue("username")
+		password := r.FormValue("password")
+		confirmPassword := r.FormValue("confirm_password")
+		
+		// Validate input
+		if username == "" || password == "" {
+			data := struct {
+				Error string
+			}{
+				Error: "Username and password are required",
+			}
+			
+			if err := RegisterTemplate.Execute(w, data); err != nil {
+				log.Printf("Error rendering register template: %v", err)
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			}
+			return
+		}
+		
+		if password != confirmPassword {
+			data := struct {
+				Error string
+			}{
+				Error: "Passwords do not match",
+			}
+			
+			if err := RegisterTemplate.Execute(w, data); err != nil {
+				log.Printf("Error rendering register template: %v", err)
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			}
+			return
+		}
+		
+		// Register user
+		if err := auth.RegisterUser(username, password); err != nil {
+			data := struct {
+				Error string
+			}{
+				Error: err.Error(),
+			}
+			
+			if err := RegisterTemplate.Execute(w, data); err != nil {
+				log.Printf("Error rendering register template: %v", err)
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			}
+			return
+		}
+		
+		// Redirect to login page
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+	
+	// Method not allowed
+	http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+}
+
+func HandleLogout(w http.ResponseWriter, r *http.Request) {
+    // Get current user and session
+    sessionID, username, loggedIn := getSessionInfo(r)
+    
+    if loggedIn {
+        // Save user's playlist
+        if err := auth.SaveUserPlaylist(username, Playlist); err != nil {
+            log.Printf("Error saving user playlist: %v", err)
+        }
+        
+        // Clear session
+        delete(activeSessions, sessionID)
+        
+        // Clear session cookie
+        cookie := http.Cookie{
+            Name:     "session_id",
+            Value:    "",
+            Path:     "/",
+            MaxAge:   -1,
+            HttpOnly: true,
+        }
+        http.SetCookie(w, &cookie)
+    }
+    
+    // Reset global playlist
+    Playlist = []api.Song{}
+    
+    // Redirect to home page
+    http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+// generateSessionID creates a unique session ID
+
+
+// AuthMiddleware checks if a user is logged in
+func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// Get session info
+		_, _, loggedIn := getSessionInfo(r)
+		
+		if !loggedIn {
+			// Redirect to login page
+			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			return
+		}
+		next(w, r)
+	}
 }

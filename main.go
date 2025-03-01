@@ -1,19 +1,24 @@
 package main
 
 import (
+	"html/template"
 	"log"
 	"net/http"
 	"os"
-	"html/template"
 	"time"
 
-	"harmonify/src/handlers"
 	"harmonify/src/api"
+	"harmonify/src/auth"
+	"harmonify/src/handlers"
 )
 
 func init() {
     if err := api.LoadConfig(); err != nil {
         log.Fatalf("Failed to load configuration: %v", err)
+    }
+
+    if err := auth.InitUserSystem(); err != nil {
+        log.Fatalf("Failed to initialize user system: %v", err)
     }
 
     funcMap := template.FuncMap{
@@ -59,30 +64,43 @@ func init() {
 	if err != nil {
 		log.Fatalf("Failed to parse FAQ template: %v", err)
 	}
+
+    handlers.LoginTemplate, err = template.New("login.html").Funcs(funcMap).ParseFiles("templates/login.html")
+    if err != nil {
+        log.Fatalf("Failed to parse login template: %v", err)
+    }
+
+    handlers.RegisterTemplate, err = template.New("register.html").Funcs(funcMap).ParseFiles("templates/register.html")
+    if err != nil {
+        log.Fatalf("Failed to parse register template: %v", err)
+    }
 }
 
 func main() {
-	log.SetOutput(os.Stdout)
-	log.SetFlags(log.LstdFlags | log.Lshortfile)
+    log.SetOutput(os.Stdout)
+    log.SetFlags(log.LstdFlags | log.Lshortfile)
 
-	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+    http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
-	http.HandleFunc("/", handlers.HandleHome)
-	http.HandleFunc("/search", handlers.HandleSearch)
-	http.HandleFunc("/lyrics", handlers.HandleLyrics)
-	http.HandleFunc("/playlist", handlers.HandlePlaylist)
-	http.HandleFunc("/playlist-lyrics", handlers.HandlePlaylistLyrics)
-	http.HandleFunc("/add-to-playlist", handlers.HandleAddToPlaylist)
-	http.HandleFunc("/remove-from-playlist", handlers.HandleRemoveFromPlaylist)
-	http.HandleFunc("/get-lyrics-text", handlers.HandleGetLyricsText)
-	http.HandleFunc("/error", handlers.HandleError)
-	http.HandleFunc("/faq", handlers.HandleFAQ)
+    http.HandleFunc("/", handlers.HandleHome)
+    http.HandleFunc("/search", handlers.HandleSearch)
+    http.HandleFunc("/lyrics", handlers.HandleLyrics)
+    http.HandleFunc("/playlist", handlers.HandlePlaylist)
+    http.HandleFunc("/playlist-lyrics", handlers.HandlePlaylistLyrics)
+    http.HandleFunc("/add-to-playlist", handlers.HandleAddToPlaylist)
+    http.HandleFunc("/remove-from-playlist", handlers.HandleRemoveFromPlaylist)
+    http.HandleFunc("/get-lyrics-text", handlers.HandleGetLyricsText)
+    http.HandleFunc("/error", handlers.HandleError)
+    http.HandleFunc("/faq", handlers.HandleFAQ)
+    http.HandleFunc("/login", handlers.HandleLogin)
+    http.HandleFunc("/register", handlers.HandleRegister)
+    http.HandleFunc("/logout", handlers.HandleLogout) 
 
-	server := &http.Server{
-		Addr:         ":8080",
-		ReadTimeout:  10 * time.Second,
-		WriteTimeout: 10 * time.Second,
-	}
-	log.Println("Server starting on http://localhost:8080")
-	log.Fatal(server.ListenAndServe())
+    server := &http.Server{
+        Addr:         ":8080",
+        ReadTimeout:  10 * time.Second,
+        WriteTimeout: 10 * time.Second,
+    }
+    log.Println("Server starting on http://localhost:8080")
+    log.Fatal(server.ListenAndServe())
 }

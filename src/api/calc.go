@@ -85,7 +85,7 @@ func (s Song) FormattedReleaseDate() string {
 }
 
 func LoadConfig() error {
-	configFile, err := os.Open("config.json")
+	configFile, err := os.Open("data/config.json")
 	if err != nil {
 		return fmt.Errorf("error opening config file: %v", err)
 	}

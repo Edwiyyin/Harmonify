@@ -134,7 +134,7 @@ body {
 }
 
 .btn-lyrics:hover {
-    background-color: #4B0082;
+    background-color: #4b0082;
     transform: translateY(-1px);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -176,7 +176,7 @@ body {
 }
 
 .toast.success {
-    background-color: #22c55e;
+    background-color: #10b981;
 }
 
 .toast.error {
@@ -184,7 +184,7 @@ body {
 }
 
 .toast.info {
-    background-color: #3b82f6;
+    background-color: #2563eb;
 }
 
 @keyframes slideIn {

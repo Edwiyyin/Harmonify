@@ -80,6 +80,7 @@ body {
     transform: translateY(-2px);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
+
 .faq-btn {
     background-color: #663399;
     color: white;
@@ -90,7 +91,6 @@ body {
     cursor: pointer;
     transition: background-color 0.3s ease;
     text-decoration: none;
-    margin: 20px;
 }
 
 .faq-btn:hover {
@@ -110,11 +110,41 @@ body {
     transition: background-color 0.3s ease;
     text-decoration: none;
     display: inline-block;
-    margin: 20px;
+    margin: 15px;
 }
 
 .doc-btn:hover {
     background-color: #059669;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.nav-buttons {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.auth-btn {
+    background-color: #4b5563;
+    color: white;
+    padding: 15px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+    font-size: 1rem;
+    display: inline-block;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border: none;
+    cursor: pointer;
+}
+
+.auth-btn:hover {
+    background-color: #374151;
     transform: translateY(-2px);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }

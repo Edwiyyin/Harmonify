@@ -137,7 +137,7 @@ body {
 }
 
 .toast.success {
-    background-color: #22c55e;
+    background-color: #10b981;
 }
 
 .toast.error {
@@ -145,7 +145,7 @@ body {
 }
 
 .toast.info {
-    background-color: #3b82f6;
+    background-color: #2563eb;
 }
 
 @keyframes slideIn {

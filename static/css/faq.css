@@ -32,7 +32,7 @@ body {
 }
 
 .faq-question {
-    color: #60a5fa;
+    color: #f59e0b;
     font-size: 1.2rem;
     margin-bottom: 10px;
     cursor: pointer;
@@ -40,7 +40,7 @@ body {
 }
 
 .faq-question:hover {
-    color: #3b82f6;
+    color: #d97706;
 }
 
 .faq-answer {

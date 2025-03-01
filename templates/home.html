@@ -8,6 +8,15 @@
 </head>
 <body>
     <div class="container">
+        <div class="nav-buttons">
+            {{if .LoggedIn}}
+                <a href="/logout" class="auth-btn">Logout</a>
+            {{else}}
+                <a href="/login" class="auth-btn">Login</a>
+                <a href="/register" class="auth-btn">Register</a>
+            {{end}}
+        </div>
+        
         <img src="/static/img/2.png" alt="Harmonify" class="logo">
         <h1 id="lyrics-finder" class="page-title">Harmonify</h1>
 
@@ -28,7 +37,7 @@
         </div>
 
         <div class="button-container">
-            <a href="/static/docs/Documentation.pdf" download class="doc-btn">Download Documentation</a>
+            <a href="/static/docs/Documentation.pdf" download class="doc-btn">Documentation</a>
             <a href="/faq" class="faq-btn">FAQ</a>
         </div>
     </div>
