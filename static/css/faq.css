@@ -78,20 +78,13 @@ body {
 }
 
 .btn-back {
-    background-color: #6b7280;
+    background-color: #4b5563;
+    width: 15%;
     color: white;
-    padding: 10px 20px;
-    border-radius: 6px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    text-decoration: none;
-    transition: all 0.2s ease;
-    border: none;
-    cursor: pointer;
 }
 
 .btn-back:hover {
-    background-color: #4b5563;
+    background-color: #374151;
     transform: translateY(-2px);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }

@@ -122,10 +122,15 @@ body {
 }
 
 .btn-back {
-    background-color: #6b7280;
-    color: white;
+    background-color: #4b5563;
     width: 10%;
-    margin-left: 20px;
+    color: white;
+}
+
+.btn-back:hover {
+    background-color: #374151;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .btn-lyrics {
