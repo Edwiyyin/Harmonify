@@ -42,6 +42,18 @@ type Song struct {
     InPlaylist  bool      `json:"in_playlist"`
 }
 
+type SpotifyTrack struct {
+    ID         string `json:"id"`
+    Name       string `json:"name"`
+    DurationMs int    `json:"duration_ms"`
+    Album      struct {
+        Images []struct {
+            URL string `json:"url"`
+        } `json:"images"`
+        ReleaseDate string `json:"release_date"`
+    } `json:"album"`
+}
+
 type Config struct {
 	SpotifyClientID     string `json:"spotify_client_id"`
 	SpotifyClientSecret string `json:"spotify_client_secret"`

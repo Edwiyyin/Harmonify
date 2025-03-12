@@ -9,13 +9,34 @@
 <body>
     <div class="container">
         <div id="toast" class="toast"></div>
-        <h1 class="song-title">{{.Title}}</h1>
-        <p class="song-artist">{{.Artist}}</p>
-        
-        <div class="lyrics-pre">{{.Lyrics}}</div>
 
+        <!-- Header Section -->
+        <div class="song-header">
+            <div class="song-cover">
+                {{if .CoverURL}}
+                    <img src="{{.CoverURL}}" alt="Album Cover" class="album-cover">
+                {{else}}
+                    <div class="no-cover-placeholder">No Cover</div>
+                {{end}}
+            </div>
+            <div class="song-info">
+                <h1 class="song-title">{{.Title}}</h1>
+                <p class="song-artist">{{.Artist}}</p>
+                <div class="song-metadata">
+                    <div class="metadata-item">
+                        <span class="metadata-label">Released:</span>
+                        <span>{{.FormattedReleaseDate}}</span>
+                    </div>
+                    <div class="metadata-item">
+                        <span class="metadata-label">Duration:</span>
+                        <span>{{.FormattedDuration}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="lyrics-pre">{{.Lyrics}}</div>
         <div class="btn-container">
-            <a href="{{.SpotifyURL}}" class="btn btn-listen" target="_blank">Open in Spotify </a>
+            <a href="{{.SpotifyURL}}" class="btn btn-listen" target="_blank">Open in Spotify</a>
             <button class="btn btn-copy">Copy Lyrics</button>
             {{if .InPlaylist}}
                 <a href="/remove-from-playlist?id={{.ID}}" class="btn btn-remove-playlist">Remove from Playlist</a>

@@ -12,25 +12,49 @@
         <div id="toast" class="toast"></div>
         
         <div class="lyrics-card">
-            <h1 id="title" class="song-title">{{.Title}}</h1>
-            <h2 id="artist" class="song-artist">{{.Artist}}</h2>
+            <!-- Header Section -->
+            <div class="song-header">
+                <div class="song-cover">
+                    {{if .CoverURL}}
+                        <img src="{{.CoverURL}}" alt="Album Cover" class="album-cover">
+                    {{else}}
+                        <div class="no-cover-placeholder">No Cover</div>
+                    {{end}}
+                </div>
+                <div class="song-info">
+                    <h1 class="song-title">{{.Title}}</h1>
+                    <p class="song-artist">{{.Artist}}</p>
+                    <div class="song-metadata">
+                        <div class="metadata-item">
+                            <span class="metadata-label">Released:</span>
+                            <span>{{.FormattedReleaseDate}}</span>
+                        </div>
+                        <div class="metadata-item">
+                            <span class="metadata-label">Duration:</span>
+                            <span>{{.FormattedDuration}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
+            <!-- Lyrics Section -->
             <pre class="lyrics-pre">{{.Lyrics}}</pre>
 
+            <!-- Buttons Section -->
             <div class="btn-container">
-                <a href="{{.SpotifyURL}}" class="btn btn-listen" target="_blank">Open in Spotify </a>
+                <a href="{{.SpotifyURL}}" class="btn btn-listen" target="_blank">Open in Spotify</a>
                 <button type="button" class="btn btn-copy">Copy Lyrics</button>
                 {{if .InPlaylist}}
-                <a href="/remove-from-playlist?id={{.ID}}" class="btn btn-remove-playlist">Remove from Playlist</a>
+                    <a href="/remove-from-playlist?id={{.ID}}" class="btn btn-remove-playlist">Remove from Playlist</a>
                 {{else}}
-                <a href="/add-to-playlist?id={{.ID}}&title={{urlquery .Title}}&artist={{urlquery .Artist}}" class="btn btn-add-playlist">Add to Playlist</a>
+                    <a href="/add-to-playlist?id={{.ID}}&title={{urlquery .Title}}&artist={{urlquery .Artist}}" class="btn btn-add-playlist">Add to Playlist</a>
                 {{end}}
                 
                 {{if .PreviewURL}}
-                <audio id="preview-player" controls>
-                    <source src="{{.PreviewURL}}" type="audio/mpeg">
-                    Your browser does not support the audio element.
-                </audio>
+                    <audio id="preview-player" controls>
+                        <source src="{{.PreviewURL}}" type="audio/mpeg">
+                        Your browser does not support the audio element.
+                    </audio>
                 {{end}}
                 <a href="/search?query={{.Query}}&page={{.Page}}" class="btn btn-back">Go Back</a>
             </div>

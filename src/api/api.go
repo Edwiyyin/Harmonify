@@ -231,6 +231,45 @@ func FetchLyricsOvh(title, artist string) (string, error) {
     return lyrics, nil
 }
 
+func FetchSpotifyTrack(trackID string) (*SpotifyTrack, error) {
+    if trackID == "" {
+        return nil, fmt.Errorf("empty track ID")
+    }
+
+    accessToken, err := GetSpotifyAccessToken()
+    if err != nil {
+        return nil, fmt.Errorf("failed to get access token: %v", err)
+    }
+
+    apiURL := fmt.Sprintf("https://api.spotify.com/v1/tracks/%s", trackID)
+    
+    req, err := http.NewRequest("GET", apiURL, nil)
+    if err != nil {
+        return nil, err
+    }
+
+    req.Header.Add("Authorization", "Bearer "+accessToken)
+    req.Header.Add("Content-Type", "application/json")
+
+    client := &http.Client{Timeout: 10 * time.Second}
+    resp, err := client.Do(req)
+    if err != nil {
+        return nil, err
+    }
+    defer resp.Body.Close()
+
+    if resp.StatusCode != http.StatusOK {
+        return nil, fmt.Errorf("failed to fetch track: %d", resp.StatusCode)
+    }
+
+    var track SpotifyTrack
+    if err := json.NewDecoder(resp.Body).Decode(&track); err != nil {
+        return nil, fmt.Errorf("failed to decode track response: %v", err)
+    }
+
+    return &track, nil
+}
+
 func SearchSpotifyMusicSource(title, artist string) (string, error) {
     accessToken, err := GetSpotifyAccessToken()
     if err != nil {
