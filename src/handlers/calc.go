@@ -38,12 +38,12 @@ type Session struct {
 var activeSessions = make(map[string]Session)
 
 func init() {
-	LoadPlaylistFromFile()
+    r, _ := http.NewRequest("GET", "/", nil)
+    LoadPlaylistFromFile(r)
 }
 
-func LoadPlaylistFromFile() ([]api.Song, error) {
-
-    _, username, loggedIn := getSessionInfo(&http.Request{})
+func LoadPlaylistFromFile(r *http.Request) ([]api.Song, error) {
+    _, username, loggedIn := getSessionInfo(r)
     playlistFile := "default.json"
 
     if loggedIn {
@@ -67,8 +67,8 @@ func LoadPlaylistFromFile() ([]api.Song, error) {
     return playlist, nil
 }
 
-func SavePlaylistToFile() error {
-    _, username, loggedIn := getSessionInfo(&http.Request{})
+func SavePlaylistToFile(r *http.Request) error {
+    _, username, loggedIn := getSessionInfo(r)
 
     playlistFile := "default.json"
     if loggedIn {
@@ -89,7 +89,6 @@ func SavePlaylistToFile() error {
 }
 
 func getSessionInfo(r *http.Request) (string, string, bool) {
-
 	cookie, err := r.Cookie("session_id")
 	if err != nil {
 		return "", "", false
@@ -104,6 +103,5 @@ func getSessionInfo(r *http.Request) (string, string, bool) {
 }
 
 func generateSessionID() string {
-
 	return fmt.Sprintf("%d", time.Now().UnixNano())
 }

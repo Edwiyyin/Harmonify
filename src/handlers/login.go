@@ -9,12 +9,8 @@ import (
 	"harmonify/src/auth"
 )
 
-
-
-
 func HandleLogin(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
-
 		if err := LoginTemplate.Execute(w, nil); err != nil {
 			log.Printf("Error rendering login template: %v", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -23,7 +19,6 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) {
 	}
 	
 	if r.Method == http.MethodPost {
-
 		if err := r.ParseForm(); err != nil {
 			http.Error(w, "Error parsing form", http.StatusBadRequest)
 			return
@@ -33,7 +28,6 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) {
 		password := r.FormValue("password")
 
 		if auth.AuthenticateUser(username, password) {
-
 			sessionID := generateSessionID()
 
 			activeSessions[sessionID] = Session{
@@ -49,7 +43,7 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) {
 				HttpOnly: true,
 			}
 			http.SetCookie(w, &cookie)
-		
+
 			playlist, err := auth.LoadUserPlaylist(username)
 			if err != nil {
 				log.Printf("Error loading user playlist: %v", err)
@@ -75,6 +69,31 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) {
 	}
 	
 	http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+}
+
+func HandleLogout(w http.ResponseWriter, r *http.Request) {
+    sessionID, username, loggedIn := getSessionInfo(r)
+    
+    if loggedIn {
+        if err := auth.SaveUserPlaylist(username, Playlist); err != nil {
+            log.Printf("Error saving user playlist: %v", err)
+        }
+        
+        delete(activeSessions, sessionID)
+    
+        cookie := http.Cookie{
+            Name:     "session_id",
+            Value:    "",
+            Path:     "/",
+            MaxAge:   -1,
+            HttpOnly: true,
+        }
+        http.SetCookie(w, &cookie)
+    }
+    
+    Playlist = []api.Song{}
+    
+    http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
 func HandleRegister(w http.ResponseWriter, r *http.Request) {
@@ -143,32 +162,6 @@ func HandleRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-}
-
-func HandleLogout(w http.ResponseWriter, r *http.Request) {
-    sessionID, username, loggedIn := getSessionInfo(r)
-    
-    if loggedIn {
-
-        if err := auth.SaveUserPlaylist(username, Playlist); err != nil {
-            log.Printf("Error saving user playlist: %v", err)
-        }
-        
-        delete(activeSessions, sessionID)
-    
-        cookie := http.Cookie{
-            Name:     "session_id",
-            Value:    "",
-            Path:     "/",
-            MaxAge:   -1,
-            HttpOnly: true,
-        }
-        http.SetCookie(w, &cookie)
-    }
-    
-    Playlist = []api.Song{}
-    
-    http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
 func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {

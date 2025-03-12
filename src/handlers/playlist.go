@@ -14,7 +14,7 @@ import (
 
 
 func HandlePlaylist(w http.ResponseWriter, r *http.Request) {
-    playlist, err := LoadPlaylistFromFile()
+    playlist, err := LoadPlaylistFromFile(r)
     if err != nil {
         log.Printf("Error loading playlist: %v", err)
         http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -122,7 +122,7 @@ func HandleAddToPlaylist(w http.ResponseWriter, r *http.Request) {
         fullSong.ReleaseDate = api.FormatReleaseDate(trackDetails.Album.ReleaseDate)
     }
     Playlist = append(Playlist, fullSong)
-    if err := SavePlaylistToFile(); err != nil {
+    if err := SavePlaylistToFile(r); err != nil {
         log.Printf("Failed to save playlist: %v", err)
         http.Redirect(w, r, fmt.Sprintf("/search?query=%s&page=%s&action=failed", query, page), http.StatusSeeOther)
         return
@@ -136,7 +136,7 @@ func HandleRemoveFromPlaylist(w http.ResponseWriter, r *http.Request) {
     for i, song := range Playlist {
         if song.ID == songId {
             Playlist = append(Playlist[:i], Playlist[i+1:]...)
-            if err := SavePlaylistToFile(); err != nil {
+            if err := SavePlaylistToFile(r); err != nil {
                 log.Printf("Failed to save playlist: %v", err)
                 http.Redirect(w, r, "/playlist?action=failed", http.StatusSeeOther)
                 return

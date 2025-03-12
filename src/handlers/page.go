@@ -15,7 +15,7 @@ func HandleHome(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    playlist, err := LoadPlaylistFromFile()
+    playlist, err := LoadPlaylistFromFile(r)
     if err != nil {
         log.Printf("Error loading playlist: %v", err)
         http.Error(w, "Internal Server Error", http.StatusInternalServerError)
