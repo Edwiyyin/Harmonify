@@ -38,11 +38,13 @@ func HandleLyrics(w http.ResponseWriter, r *http.Request) {
     }
 
     var coverURL, releaseDate, duration string
-    if spotifyTrack != nil {
+if spotifyTrack != nil {
+    if len(spotifyTrack.Album.Images) > 0 {
         coverURL = spotifyTrack.Album.Images[0].URL
-        releaseDate = spotifyTrack.Album.ReleaseDate
-        duration = fmt.Sprintf("%d:%02d", spotifyTrack.DurationMs/60000, (spotifyTrack.DurationMs%60000)/1000)
     }
+    releaseDate = spotifyTrack.Album.ReleaseDate
+    duration = fmt.Sprintf("%d:%02d", spotifyTrack.DurationMs/60000, (spotifyTrack.DurationMs%60000)/1000)
+}
 
     inPlaylist := false
     for _, song := range Playlist {
@@ -124,7 +126,6 @@ func HandlePlaylistLyrics(w http.ResponseWriter, r *http.Request) {
 
     spotifyURL := fmt.Sprintf("https://open.spotify.com/track/%s", songID)
 
-    // Fetch Spotify track details to get cover URL, release date, and duration
     spotifyTrack, err := api.FetchSpotifyTrack(songID)
     if err != nil {
         log.Printf("Error fetching Spotify track details: %v", err)
@@ -145,7 +146,6 @@ func HandlePlaylistLyrics(w http.ResponseWriter, r *http.Request) {
         }
     }
 
-    // Updated data struct to include CoverURL, FormattedReleaseDate, and FormattedDuration
     data := struct {
         ID                   string
         Title                string
