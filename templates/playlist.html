@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Your Playlist</title>
+    <link rel="stylesheet" href="/static/css/playlist.css">
+    <link rel="icon" href="/static/img/2.png">
+</head>
+<body>
+    <div class="container">
+        <div id="toast" class="toast"></div>
+        <h1 id="your-playlist" class="page-title">Your Playlist</h1>
+        <a href="/" class="btn btn-back">Back to Search</a>
+        
+        {{if .Playlist}}
+        <div class="results-grid">
+            {{ range .Playlist }}
+            <div class="song-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="song-cover">
+                            {{if .CoverURL}}
+                                <img src="{{.CoverURL}}" alt="Album Cover" class="cover-image">
+                            {{else}}
+                                <div class="no-cover-placeholder">No Cover</div>
+                            {{end}}
+                        </div>
+                        <h2>{{.Title}}</h2>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="song-details">
+                            <h2>{{.Title}}</h2>
+                            <p>{{.Artist}}</p>
+                            <p class="release-date">Released: {{.FormattedReleaseDate}}</p>
+                            <p class="duration">Duration: {{.FormattedDuration}}</p>
+                        </div>
+                        <div class="song-actions">
+                            <a href="/playlist-lyrics?id={{.ID}}&title={{.Title}}&artist={{.Artist}}" class="btn btn-lyrics">Lyrics</a>
+                            <a href="/remove-from-playlist?id={{.ID}}" class="btn btn-remove-playlist">Remove</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{ end }}
+        </div>
+        {{else}}
+        <div class="no-playlist-items">
+            <p>Your playlist is empty. Start searching and add some songs!</p>
+        </div>
+        {{end}}
+    </div>
+    <script src="/static/js/playlist.js"></script>
+</body>
+</html>

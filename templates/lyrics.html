@@ -3,102 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <title>{{.Title}} - Lyrics</title>
-    <style>
-        body {
-            background-color: #f3f4f6;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-        .container {
-            max-width: 768px;
-            margin: 0 auto;
-            padding: 2rem 1rem;
-            flex-grow: 1;
-        }
-        .lyrics-card {
-            background-color: white;
-            padding: 1.5rem;
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        .song-title {
-            font-size: 1.875rem;
-            font-weight: bold;
-            text-align: center;
-            color: #2563eb;
-            margin-bottom: 1rem;
-        }
-        .song-artist {
-            font-size: 1.25rem;
-            text-align: center;
-            color: #6b7280;
-            margin-bottom: 1.5rem;
-        }
-        .lyrics-pre {
-            white-space: pre-wrap;
-            background-color: #f9fafb;
-            padding: 1rem;
-            border-radius: 0.375rem;
-        }
-        .btn {
-            display: inline-block;
-            padding: 0.5rem 1rem;
-            border-radius: 0.375rem;
-            text-align: center;
-            color: white;
-        }
-        .btn-favorite {
-            background-color: #16a34a;
-        }
-        .btn-back {
-            background-color: #2563eb;
-        }
-        .btn-container {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin-top: 1.5rem;
-        }
-    </style>
+    <link rel="stylesheet" href="/static/css/lyrics.css">
+    <link rel="stylesheet" href="/static/css/toast.css">
+    <link rel="icon" href="/static/img/2.png">
 </head>
 <body>
     <div class="container">
+        <div id="toast" class="toast"></div>
+        
         <div class="lyrics-card">
-            <h1 class="song-title">{{.Title}}</h1>
-            <h2 class="song-artist">{{.Artist}}</h2>
+            <div class="song-header">
+                <div class="song-cover">
+                    {{if .CoverURL}}
+                        <img src="{{.CoverURL}}" alt="Album Cover" class="album-cover">
+                    {{else}}
+                        <div class="no-cover-placeholder">No Cover</div>
+                    {{end}}
+                </div>
+                <div class="song-info">
+                    <h1 class="song-title">{{.Title}}</h1>
+                    <p class="song-artist">{{.Artist}}</p>
+                    <div class="song-metadata">
+                        <div class="metadata-item">
+                            <span class="metadata-label">Released:</span>
+                            <span>{{.FormattedReleaseDate}}</span>
+                        </div>
+                        <div class="metadata-item">
+                            <span class="metadata-label">Duration:</span>
+                            <span>{{.FormattedDuration}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <pre class="lyrics-pre">{{.Lyrics}}</pre>
 
             <div class="btn-container">
-                <button onclick="addToFavorites('{{.ID}}', '{{.Title}}', '{{.Artist}}')" 
-                        class="btn btn-favorite">
-                    Add to Favorites 
-                </button>
-               <a href="javascript:history.back()" class="btn btn-back">
-                Go Back</a>
+                <a href="{{.SpotifyURL}}" class="btn btn-listen" target="_blank">Open in Spotify</a>
+                <button type="button" class="btn btn-copy">Copy Lyrics</button>
+                {{if .InPlaylist}}
+                    <a href="/remove-from-playlist?id={{.ID}}" class="btn btn-remove-playlist">Remove from Playlist</a>
+                {{else}}
+                    <a href="/add-to-playlist?id={{.ID}}&title={{urlquery .Title}}&artist={{urlquery .Artist}}" class="btn btn-add-playlist">Add to Playlist</a>
+                {{end}}
+                
+                {{if .PreviewURL}}
+                    <audio id="preview-player" controls>
+                        <source src="{{.PreviewURL}}" type="audio/mpeg">
+                        Your browser does not support the audio element.
+                    </audio>
+                {{end}}
+                <a href="/search?query={{.Query}}&page={{.Page}}" class="btn btn-back">Go Back</a>
             </div>
         </div>
     </div>
-
-    <script>
-    function addToFavorites(id, title, artist) {
-        fetch('/add-favorite', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({id, title, artist})
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('Added to favorites!');
-            } else {
-                alert('Failed to add to favorites.');
-            }
-        });
-    }
-    </script>
+    <script src="/static/js/lyrics.js"></script>
 </body>
 </html>

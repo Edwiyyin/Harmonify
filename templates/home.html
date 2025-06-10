@@ -2,109 +2,45 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lyrics Finder</title>
-    <style>
-    :root {
-        --primary-color: #4a5568;
-        --secondary-color: #667eea;
-        --text-dark: #2d3748;
-        --text-light: #718096;
-        --background-light: #f7fafc;
-        --white: #ffffff;
-        --soft-shadow: 0 10px 15px rgba(0, 0, 0, 0.05);
-    }
-
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-
-    body {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        background-color: var(--background-light);
-        color: var(--text-dark);
-        line-height: 1.6;
-    }
-
-    .container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 2rem;
-    }
-
-    .page-title {
-        text-align: center;
-        color: var(--primary-color);
-        margin-bottom: 2rem;
-        font-size: 1.75rem;
-    }
-
-    .search-container {
-        display: flex;
-        justify-content: center;
-        margin-bottom: 2rem;
-    }
-
-    .search-form {
-        display: flex;
-        max-width: 500px;
-        width: 100%;
-    }
-
-    .search-input {
-        flex-grow: 1;
-        padding: 0.75rem 1rem;
-        border: 2px solid var(--secondary-color);
-        border-right: none;
-        border-radius: 10px 0 0 10px;
-        font-size: 1rem;
-    }
-
-    .search-button {
-        padding: 0.75rem 1.5rem;
-        background-color: var(--secondary-color);
-        color: white;
-        border: 2px solid var(--secondary-color);
-        border-radius: 0 10px 10px 0;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-    }
-
-    .search-button:hover {
-        background-color: color-mix(in srgb, var(--secondary-color) 90%, white);
-    }
-
-    .favorites-link {
-        text-align: center;
-        margin-top: 1.5rem;
-    }
-
-    .favorites-link a {
-        color: var(--secondary-color);
-        text-decoration: underline;
-    }
-    </style>
+    <link rel="stylesheet" href="/static/css/home.css">
+    <link rel="icon" href="/static/img/2.png">
 </head>
 <body>
     <div class="container">
-        <h1 class="page-title">Lyrics Finder</h1>
+        <div class="nav-buttons">
+            {{if .LoggedIn}}
+                <a href="/logout" class="auth-btn">Logout</a>
+            {{else}}
+                <a href="/login" class="auth-btn">Login</a>
+                <a href="/register" class="auth-btn">Register</a>
+            {{end}}
+        </div>
         
+        <img src="/static/img/2.png" alt="Harmonify" class="logo">
+        <h1 id="lyrics-finder" class="page-title">Harmonify</h1>
+
+        <div class="slogan">Unlock Every Line of Your Favorite Songs</div>
+
         <div class="search-container">
             <form action="/search" method="GET" class="search-form">
                 <input type="text" 
-                       name="query" 
-                       class="search-input" 
-                       placeholder="Search for songs, artists..." 
-                       required>
-                <button type="submit" class="search-button">Search</button>
+                    name="query" 
+                    class="search-input" 
+                    placeholder="Search for songs, artists..." 
+                    required>
+                <div class="action-buttons">
+                    <button type="submit" class="search-btn">Search</button>
+                    <a href="/playlist" class="playlist-btn">View Playlists</a>
+                </div>
             </form>
         </div>
 
-        <div class="favorites-link">
-            <a href="/favorites">View Favorites</a>
+        <div class="button-container">
+            <a href="/static/docs/Documentation.pdf" download class="doc-btn">Documentation</a>
+            <a href="/faq" class="faq-btn">FAQ</a>
         </div>
     </div>
+    <script src="/static/js/home.js"></script>
 </body>
 </html>

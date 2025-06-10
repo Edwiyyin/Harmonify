@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ - Groupie Tracker</title>
+    <link rel="stylesheet" href="/static/css/faq.css">
+    <link rel="icon" href="/static/img/2.png">
+</head>
+<body>
+    <div class="container">
+        <h1 class="page-title">Frequently Asked Questions</h1>
+        <div class="faq-list">
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleAnswer(1)">
+                    Q: How did you break down the project?
+                </div>
+                <div class="faq-answer" id="answer1">
+                    A: The project was broken down into five main phases:
+                    <ul>
+                        <li>Phase 1 - API Selection and Testing (1 week):
+                            <ul class="nested-list">
+                                <li>Researched and selected Spotify and Lyrics.ovh APIs</li>
+                                <li>Tested endpoints with Postman</li>
+                                <li>Documented API limitations and responses</li>
+                                <li>Validated the choice with the supervisor</li>
+                            </ul>
+                        </li>
+                        <li>Phase 2 - Design and Wireframing (1 week):
+                            <ul class="nested-list">
+                                <li>Created wireframes for all required pages</li>
+                                <li>Designed the user interface with a music-focused theme</li>
+                                <li>Validated the site structure</li>
+                            </ul>
+                        </li>
+                        <li>Phase 3 - Development (2 weeks):
+                            <ul class="nested-list">
+                                <li>Implemented song search functionality using Spotify API</li>
+                                <li>Developed filtering system for date, artist, and duration</li>
+                                <li>Created pagination for search results</li>
+                                <li>Built favorites system with JSON persistence</li>
+                                <li>Integrated lyrics retrieval from Lyrics.ovh</li>
+                            </ul>
+                        </li>
+                        <li>Phase 4 - Testing and Debugging (3 days):
+                            <ul class="nested-list">
+                                <li>Tested all functionalities</li>
+                                <li>Implemented error handling for API failures</li>
+                                <li>Tested browser compatibility</li>
+                                <li>Fixed identified bugs</li>
+                            </ul>
+                        </li>
+                        <li>Phase 5 - Documentation and Finalization (4 days):
+                            <ul class="nested-list">
+                                <li>Wrote comprehensive README</li>
+                                <li>Documented all routes</li>
+                                <li>Created this FAQ page</li>
+                                <li>Prepared the final deliverable</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleAnswer(2)">
+                    Q: How did you manage your time?
+                </div>
+                <div class="faq-answer" id="answer2">
+                    A: Time management was structured around several key aspects:
+                    <ul>
+                        <li>Planning:
+                            <ul class="nested-list">
+                                <li>Set weekly progress checkpoints</li>
+                                <li>Built in a 3-day buffer for unexpected issues</li>
+                                <li>Prioritized tasks at the beginning of each week</li>
+                                <li>Alternated between focused work sessions and breaks</li>
+                            </ul>
+                        </li>
+                        <li>Prioritization:
+                            <ul class="nested-list">
+                                <li>First focused on the mandatory features (search, filtering, pagination, favorites)</li>
+                                <li>Developed features based on their technical dependencies</li>
+                                <li>Implemented continuous testing to prevent bug accumulation</li>
+                                <li>Only added bonus features after completing the essentials</li>
+                            </ul>
+                        </li>
+                        <li>Daily Organization:
+                            <ul class="nested-list">
+                                <li>Dedicated 2-4 hours per day to development</li>
+                                <li>Reserved afternoons for testing and debugging</li>
+                                <li>Documented progress at the end of each day</li>
+                                <li>Performed daily code reviews</li>
+                            </ul>
+                        </li>
+                        <li>Risk Management:
+                            <ul class="nested-list">
+                                <li>Identified critical points early (API token management, error handling)</li>
+                                <li>Prepared backup solutions for complex features</li>
+                                <li>Monitored API limitations and rate limits</li>
+                                <li>Maintained regular progress tracking</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleAnswer(3)">
+                    Q: What was your documentation strategy?
+                </div>
+                <div class="faq-answer" id="answer3">
+                    A: My documentation strategy consisted of:
+                    <ul>
+                        <li>API Documentation:
+                            <ul class="nested-list">
+                                <li>Created detailed notes on Spotify and Lyrics.ovh API endpoints</li>
+                                <li>Documented authentication requirements and token management</li>
+                                <li>Kept a record of response formats and error codes</li>
+                            </ul>
+                        </li>
+                        <li>Code Documentation:
+                            <ul class="nested-list">
+                                <li>Added comments to explain complex functions</li>
+                                <li>Used consistent naming conventions</li>
+                                <li>Documented all handlers and routes</li>
+                                <li>Added error handling explanations</li>
+                            </ul>
+                        </li>
+                        <li>Project Documentation:
+                            <ul class="nested-list">
+                                <li>Created a comprehensive README with installation instructions</li>
+                                <li>Listed all implemented features</li>
+                                <li>Documented site architecture</li>
+                                <li>Added troubleshooting guides</li>
+                            </ul>
+                        </li>
+                        <li>Learning Resources:
+                            <ul class="nested-list">
+                                <li>Used official Go documentation for standard libraries</li>
+                                <li>Referenced Spotify API documentation</li>
+                                <li>Consulted Go web development guides and best practices</li>
+                                <li>Joined Discord communities for specific technical questions</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleAnswer(4)">
+                    Q: What challenges did you face and how did you overcome them?
+                </div>
+                <div class="faq-answer" id="answer4">
+                    A: Several challenges were encountered during development:
+                    <ul>
+                        <li>API Token Management:
+                            <ul class="nested-list">
+                                <li>Challenge: Handling expired Spotify access tokens</li>
+                                <li>Solution: Implemented automatic token refresh with expiry tracking</li>
+                            </ul>
+                        </li>
+                        <li>Lyrics Retrieval:
+                            <ul class="nested-list">
+                                <li>Challenge: Inconsistent responses from Lyrics.ovh API</li>
+                                <li>Solution: Added error handling and sanitization for search queries</li>
+                            </ul>
+                        </li>
+                        <li>Pagination System:
+                            <ul class="nested-list">
+                                <li>Challenge: Maintaining state between search, filter, and page navigation</li>
+                                <li>Solution: Used URL parameters to preserve state across page loads</li>
+                            </ul>
+                        </li>
+                        <li>Error Handling:
+                            <ul class="nested-list">
+                                <li>Challenge: Gracefully handling API outages</li>
+                                <li>Solution: Implemented custom error pages and fallback content</li>
+                            </ul>
+                        </li>
+                        <li>Performance Optimization:
+                            <ul class="nested-list">
+                                <li>Challenge: Slow response times for search results</li>
+                                <li>Solution: Implemented client-side filtering and caching of recent searches</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="btn-container">
+            <a href="/" class="btn btn-back">Back to Home</a>
+        </div>
+    </div>
+
+    <script>
+        function toggleAnswer(id) {
+            const answer = document.getElementById(`answer${id}`);
+            answer.classList.toggle('show');
+        }
+    </script>
+</body>
+</html>

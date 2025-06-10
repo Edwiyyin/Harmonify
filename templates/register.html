@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register - Harmonify</title>
+    <link rel="stylesheet" href="/static/css/home.css">
+    <link rel="stylesheet" href="/static/css/form.css">
+    <link rel="icon" href="/static/img/2.png">
+</head>
+<body>
+    <div class="container">
+        <img src="/static/img/2.png" alt="Harmonify" class="logo">
+        <h1 id="lyrics-finder" class="page-title">Harmonify</h1>
+        
+        <div class="form-container">
+            <h2>Register</h2>
+            
+            {{if .Error}}
+            <div class="error-message">{{.Error}}</div>
+            {{end}}
+            
+            <form action="/register" method="POST">
+                <div class="form-group">
+                    <label class="form-label" for="username">Username</label>
+                    <input class="form-input" type="text" id="username" name="username" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="password">Password</label>
+                    <input class="form-input" type="password" id="password" name="password" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="confirm_password">Confirm Password</label>
+                    <input class="form-input" type="password" id="confirm_password" name="confirm_password" required>
+                </div>
+                
+                <button type="submit" class="form-button">Register</button>
+            </form>
+            
+            <div class="form-footer">
+                Already have an account? <a href="/login">Login</a>
+            </div>
+            
+            <div class="form-footer">
+                <a href="/">Back to Home</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
